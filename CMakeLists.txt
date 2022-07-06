@@ -8,10 +8,13 @@ project(
 )
 
 set (CMAKE_FOLDER ./)
+set (name bake)
 set (sources
 	src/main.cpp
 )
 
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
-add_executable(bake ${sources})
+link_libraries(OpenSSL::SSL)
+include_directories(./src)
+add_executable(${name} ${sources})
