@@ -11,6 +11,7 @@ set (CMAKE_FOLDER ./)
 set (name bake)
 set (sources
 	test/app.cpp
+	src/core/Core.cpp
 	src/core/ec.cpp
 )
 
