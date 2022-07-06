@@ -5,6 +5,8 @@ using namespace std;
 
 int main() {
     cout << "Hello, World!" << std::endl;
+    Group G;
+    BigInt i;
 
     return 0;
 }

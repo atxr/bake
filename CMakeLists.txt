@@ -10,7 +10,8 @@ project(
 set (CMAKE_FOLDER ./)
 set (name bake)
 set (sources
-	src/main.cpp
+	test/app.cpp
+	src/core/ec.cpp
 )
 
 find_package(OpenSSL REQUIRED)
