@@ -57,6 +57,7 @@ public:
     void to_bin(unsigned char *buf, size_t buf_len);
     size_t size();
     void from_bin(Group *g, const unsigned char *buf, size_t buf_len);
+    void fromHash(Group *g, BigInt hash);
 
     Point add(Point &rhs);
     //		Point sub(Point & rhs);

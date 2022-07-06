@@ -4,14 +4,14 @@
  * @brief  Implements the classes from ec.hpp
  * @version 0.1
  * @date 2022-07-05
- * 
+ *
  * File initially copied from https://github.com/emp-toolkit/emp-tool/blob/master/emp-tool/utils/group_openssl.h
  */
 
 #include "ec.hpp"
 #include <iostream>
 
-void error(const char *s, int line=0, const char *file=nullptr)
+void error(const char *s, int line = 0, const char *file = nullptr)
 {
     fprintf(stderr, s, "\n");
     if (file != nullptr)
@@ -151,6 +151,63 @@ void Point::from_bin(Group *g, const unsigned char *buf, size_t buf_len)
         error("ECC FROM_BIN");
 }
 
+void Point::fromHash(Group *g, BigInt x)
+{
+    if (point == nullptr)
+    {
+        group = g;
+        point = EC_POINT_new(group->ec_group);
+    }
+
+    BigInt a;
+    BigInt b;
+    BigInt p;
+    BN_CTX *ctx = group->bn_ctx;
+
+    // TODO nicer assertion with logs
+    if (EC_GROUP_get_curve(g->ec_group, p.n, a.n, b.n, nullptr) == 0)
+    {
+        std::cout << "Error at get curve" << std::endl;
+    }
+
+    BigInt incr;
+    incr.from_bin((unsigned char *)"\x01", 1);
+    BN_print_fp(stdout, incr.n);
+    std::cout << std::endl;
+
+    while (1)
+    {
+        // generate y
+        // y^2 = x^3 + ax + b
+        BigInt y;
+        BigInt y2(x);
+        y2 = y2.mul_mod(x, p, ctx).mul_mod(x, p, ctx);
+        a = a.mul_mod(x, p, ctx);
+        y2 = y2.add_mod(a, p, ctx).add_mod(b, p, ctx);
+        std::cout << "y2 = 0x"; BN_print_fp(stdout, y2.n); std::cout << std::endl;
+        std::cout << "p = 0x"; BN_print_fp(stdout, p.n); std::cout << std::endl;
+        if (BN_mod_sqrt(y.n, y2.n, p.n, ctx))
+        {
+            std::cout << "y = 0x"; BN_print_fp(stdout, y.n); std::cout << std::endl;
+            EC_POINT_set_affine_coordinates_GFp(group->ec_group, point, x.n, y.n, ctx);
+            if (EC_POINT_is_on_curve(group->ec_group, point, ctx) == 1)
+            {
+                std::cout << "SQRT succedded!" << std::endl;
+                break;
+            }
+            else
+            {
+                std::cout << "Error point is not on the curve, adding 1 to the hash" << std::endl;
+                break;
+            }
+        }
+        else
+        {
+            std::cout << "SQRT failed, adding 1 to hash" << std::endl;
+        }
+        x = x.add(incr);
+    }
+}
 
 Point Point::add(Point &rhs)
 {
