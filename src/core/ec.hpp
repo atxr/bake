@@ -38,6 +38,7 @@ public:
     BigInt mod(const BigInt &oth, BN_CTX *ctx);
     BigInt add_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx);
     BigInt mul_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx);
+    BigInt inv_mod(const BigInt &m, BN_CTX *ctx) const;
 };
 
 /**

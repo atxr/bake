@@ -71,6 +71,13 @@ BigInt BigInt::mul_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx)
     return ret;
 }
 
+BigInt BigInt::inv_mod(const BigInt &m, BN_CTX *ctx) const
+{
+    BigInt ret;
+    BN_mod_inverse(ret.n, n, m.n, ctx);
+    return ret;
+}
+
 BigInt BigInt::add_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx)
 {
     BigInt ret;
@@ -183,26 +190,26 @@ void Point::fromHash(Group *g, BigInt x)
     BigInt incr;
     BN_one(incr.n);
 
-        // generate y
-        // y^2 = x^3 + ax + b
-        BigInt y;
-        BigInt y2(x);
-        y2 = y2.mul_mod(x, p, ctx).mul_mod(x, p, ctx);
-        a = a.mul_mod(x, p, ctx);
-        y2 = y2.add_mod(a, p, ctx).add_mod(b, p, ctx);
-        if (BN_mod_sqrt(y.n, y2.n, p.n, ctx))
-        {
+    // generate y
+    // y^2 = x^3 + ax + b
+    BigInt y;
+    BigInt y2(x);
+    y2 = y2.mul_mod(x, p, ctx).mul_mod(x, p, ctx);
+    a = a.mul_mod(x, p, ctx);
+    y2 = y2.add_mod(a, p, ctx).add_mod(b, p, ctx);
+    if (BN_mod_sqrt(y.n, y2.n, p.n, ctx))
+    {
         EC_POINT_set_affine_coordinates(group->ec_group, point, x.n, y.n, ctx);
-                std::cout << "SQRT succedded!" << std::endl;
+        std::cout << "SQRT succedded!" << std::endl;
         return;
-        }
-        else
-        {
-            std::cout << "SQRT failed, adding 1 to hash" << std::endl;
-        }
-        x = x.add(incr);
-    fromHash(g, x);
     }
+    else
+    {
+        std::cout << "SQRT failed, adding 1 to hash" << std::endl;
+    }
+    x = x.add(incr);
+    fromHash(g, x);
+}
 
 bool Point::is_on_curve()
 {
