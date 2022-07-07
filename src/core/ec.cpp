@@ -124,6 +124,16 @@ Point &Point::operator=(Point p)
     return *this;
 }
 
+void Point::print() {
+    BigInt x,y;
+    EC_POINT_get_affine_coordinates(group->ec_group, point, x.n, y.n, group->bn_ctx);
+    std::cout << "x = 0x";
+    BN_print_fp(stdout, x.n);
+    std::cout << std::endl << "y = 0x";
+    BN_print_fp(stdout, y.n);
+    std::cout << std::endl;
+}
+
 void Point::to_bin(unsigned char *buf, size_t buf_len)
 {
     int ret = EC_POINT_point2oct(group->ec_group, point, POINT_CONVERSION_UNCOMPRESSED, buf, buf_len, group->bn_ctx);
@@ -194,7 +204,8 @@ void Point::fromHash(Group *g, BigInt x)
     fromHash(g, x);
     }
 
-bool Point::is_on_curve() {
+bool Point::is_on_curve()
+{
     return EC_POINT_is_on_curve(group->ec_group, point, group->bn_ctx) > 0;
 }
 
@@ -224,12 +235,18 @@ Point Point::inv()
         error("ECC INV");
     return ret;
 }
+
 bool Point::operator==(Point &rhs)
 {
     int ret = EC_POINT_cmp(group->ec_group, point, rhs.point, group->bn_ctx);
     if (ret == -1)
         error("ECC CMP");
     return (ret == 0);
+}
+
+bool Point::operator!=(Point &rhs)
+{
+    return !(this->operator==(rhs));
 }
 
 Group::Group()

@@ -53,6 +53,7 @@ public:
     ~Point();
     Point(const Point &p);
     Point &operator=(Point p);
+    void print();
 
     void to_bin(unsigned char *buf, size_t buf_len);
     size_t size();
@@ -66,6 +67,7 @@ public:
     Point mul(const BigInt &m);
     Point inv();
     bool operator==(Point &rhs);
+    bool operator!=(Point &rhs);
 };
 
 /**
