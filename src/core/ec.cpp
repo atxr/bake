@@ -193,6 +193,9 @@ void Point::fromHash(Group *g, BigInt x)
         x = x.add(incr);
     fromHash(g, x);
     }
+
+bool Point::is_on_curve() {
+    return EC_POINT_is_on_curve(group->ec_group, point, group->bn_ctx) > 0;
 }
 
 Point Point::add(Point &rhs)

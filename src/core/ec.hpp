@@ -62,7 +62,7 @@ public:
     Point add(Point &rhs);
     //		Point sub(Point & rhs);
     //		bool is_at_infinity();
-    //		bool is_on_curve();
+    bool is_on_curve();
     Point mul(const BigInt &m);
     Point inv();
     bool operator==(Point &rhs);
