@@ -171,12 +171,8 @@ void Point::fromHash(Group *g, BigInt x)
     }
 
     BigInt incr;
-    incr.from_bin((unsigned char *)"\x01", 1);
-    BN_print_fp(stdout, incr.n);
-    std::cout << std::endl;
+    BN_one(incr.n);
 
-    while (1)
-    {
         // generate y
         // y^2 = x^3 + ax + b
         BigInt y;
@@ -184,28 +180,18 @@ void Point::fromHash(Group *g, BigInt x)
         y2 = y2.mul_mod(x, p, ctx).mul_mod(x, p, ctx);
         a = a.mul_mod(x, p, ctx);
         y2 = y2.add_mod(a, p, ctx).add_mod(b, p, ctx);
-        std::cout << "y2 = 0x"; BN_print_fp(stdout, y2.n); std::cout << std::endl;
-        std::cout << "p = 0x"; BN_print_fp(stdout, p.n); std::cout << std::endl;
         if (BN_mod_sqrt(y.n, y2.n, p.n, ctx))
         {
-            std::cout << "y = 0x"; BN_print_fp(stdout, y.n); std::cout << std::endl;
-            EC_POINT_set_affine_coordinates_GFp(group->ec_group, point, x.n, y.n, ctx);
-            if (EC_POINT_is_on_curve(group->ec_group, point, ctx) == 1)
-            {
+        EC_POINT_set_affine_coordinates(group->ec_group, point, x.n, y.n, ctx);
                 std::cout << "SQRT succedded!" << std::endl;
-                break;
-            }
-            else
-            {
-                std::cout << "Error point is not on the curve, adding 1 to the hash" << std::endl;
-                break;
-            }
+        return;
         }
         else
         {
             std::cout << "SQRT failed, adding 1 to hash" << std::endl;
         }
         x = x.add(incr);
+    fromHash(g, x);
     }
 }
 
