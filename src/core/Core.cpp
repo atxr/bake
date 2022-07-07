@@ -1,12 +1,12 @@
 #include "Core.hpp"
 #include <iostream>
 
-Point Core::hashToCurve(Group G, BigInt hash)
+void Core::hashToCurve(Point *ret, Group G, BigInt hash)
 {
-    Point point;
-    point.fromHash(&G, hash);
+    *ret = Point();
+    ret->fromHash(&G, hash);
     
-    if (point.is_on_curve())
+    if (ret->is_on_curve())
     {
         std::cout << "HashToCurve generated a point p on the curve" << std::endl;
     }

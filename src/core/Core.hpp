@@ -6,5 +6,5 @@
 class Core
 {
 public:
-static Point hashToCurve(Group G, BigInt hash);
+    static void hashToCurve(Point *ret, Group G, BigInt hash);
 };
