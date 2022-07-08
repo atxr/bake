@@ -216,6 +216,11 @@ bool Point::is_on_curve()
     return EC_POINT_is_on_curve(group->ec_group, point, group->bn_ctx) > 0;
 }
 
+bool Point::is_empty()
+{
+    return point == nullptr;
+}
+
 Point Point::add(Point &rhs)
 {
     Point ret(group);
