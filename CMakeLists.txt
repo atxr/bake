@@ -13,6 +13,9 @@ set (sources
 	test/app.cpp
 	src/core/Core.cpp
 	src/core/ec.cpp
+	src/client/Client.cpp
+	src/server/ComputationServer.cpp
+	src/server/AuthenticationServer.cpp
 )
 
 find_package(OpenSSL REQUIRED)
