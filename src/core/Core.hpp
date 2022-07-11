@@ -13,3 +13,5 @@ public:
     static Point blind(const Point p, const BigInt r);
     static Point unblind(const Point b, const BigInt r);
 };
+
+class FuzzyVault{};
