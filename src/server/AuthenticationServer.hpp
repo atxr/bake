@@ -4,7 +4,7 @@
 class AuthenticationServer
 {
 public:
-    AuthenticationServer(Group g);
+    Point sign(Point r);
 
 private:
     Group G;
