@@ -324,14 +324,15 @@ Group::Group()
 
 Group::~Group()
 {
-    if (ec_group != nullptr)
-        EC_GROUP_free(ec_group);
+    // TODO MEMORY LEAK...
+    // if (ec_group != nullptr)
+    //     EC_GROUP_free(ec_group);
 
-    if (bn_ctx != nullptr)
-        BN_CTX_free(bn_ctx);
+    // if (bn_ctx != nullptr)
+    //     BN_CTX_free(bn_ctx);
 
-    if (scratch != nullptr)
-        delete[] scratch;
+    // if (scratch != nullptr)
+    //     delete[] scratch;
 }
 
 void Group::resize_scratch(size_t size)
