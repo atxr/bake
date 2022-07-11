@@ -4,7 +4,8 @@
 
 using namespace std;
 
-int main() {
+int main()
+{
     // Test hashToCurve
     Group G;
     BigInt hash, r;
@@ -13,7 +14,7 @@ int main() {
 
     Point p;
     p.fromHash(&G, hash);
-    
+
     if (p.is_on_curve())
     {
         std::cout << "HashToCurve generated a point p on the curve" << std::endl;
@@ -24,7 +25,7 @@ int main() {
     }
 
     // Test curveToHash
-    BigInt hash2 = Core::curveToHash(p);
+    BigInt hash2 = p.toHash();
     std::cout << "Hashing point p ... " << endl;
     BN_print_fp(stdout, hash2.n);
     std::cout << std::endl;

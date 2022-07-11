@@ -10,7 +10,8 @@ project(
 set (CMAKE_FOLDER ./)
 set (name bake)
 set (app
-	test/app.cpp
+	test/client.cpp
+	test/blinding.cpp
 	test/hash.cpp
 )
 set (sources
@@ -31,5 +32,3 @@ foreach(sourcefile ${app})
 	string( REPLACE "test/" "" appname ${appname} )
 	add_executable(${appname} ${sourcefile} ${sources})
 endforeach(sourcefile ${app})
-
-

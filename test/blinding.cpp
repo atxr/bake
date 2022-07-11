@@ -13,8 +13,8 @@ int main() {
     Point p;
     p.fromHash(&G, hash);
 
-    Point b = Core::blind(p, r);
-    Point u = Core::unblind(b, r);
+    Point b = blind(p, r);
+    Point u = unblind(b, r);
     if (p != b && p == u) {
         cout << "Blinding OK" << endl;
     }
