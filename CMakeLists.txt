@@ -9,8 +9,11 @@ project(
 
 set (CMAKE_FOLDER ./)
 set (name bake)
-set (sources
+set (app
 	test/app.cpp
+	test/hash.cpp
+)
+set (sources
 	src/core/Core.cpp
 	src/core/ec.cpp
 	src/client/Client.cpp
@@ -22,4 +25,11 @@ find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 link_libraries(OpenSSL::SSL)
 include_directories(./src)
-add_executable(${name} ${sources})
+
+foreach(sourcefile ${app})
+	string( REPLACE ".cpp" "" appname ${sourcefile} )
+	string( REPLACE "test/" "" appname ${appname} )
+	add_executable(${appname} ${sourcefile} ${sources})
+endforeach(sourcefile ${app})
+
+

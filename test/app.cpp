@@ -12,25 +12,11 @@ int main() {
 
     Point p;
     p.fromHash(&G, hash);
-    
-    if (p.is_on_curve())
-    {
-        std::cout << "HashToCurve generated a point p on the curve" << std::endl;
-    }
-    else
-    {
-        std::cout << "HashToCurve didn't generate a point on the curve" << std::endl;
-    }
 
     Point b = Core::blind(p, r);
     Point u = Core::unblind(b, r);
-    if (p != b) {
+    if (p != b && p == u) {
         cout << "Blinding OK" << endl;
     }
-
-    if (p == u) {
-        cout << "Unblinding OK" << endl;
-    }
-
     return 0;
 }
