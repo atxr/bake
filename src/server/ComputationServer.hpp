@@ -9,6 +9,8 @@ class ComputationServer
 {
 public:
     ComputationServer(AuthenticationServer as);
+    Point sign(FuzzyVault vault, unsigned int id, Point r);
+    bool store(FuzzyVault vault, unsigned int id, BigInt cpk_r);
 
 private:
     AuthenticationServer as;
