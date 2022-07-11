@@ -10,6 +10,7 @@
 
 #include "ec.hpp"
 #include <iostream>
+#include <openssl/sha.h>
 
 void error(const char *s, int line = 0, const char *file = nullptr)
 {
@@ -199,7 +200,17 @@ void Point::fromHash(Group *g, BigInt x)
     y2 = y2.add_mod(a, p, ctx).add_mod(b, p, ctx);
     if (BN_mod_sqrt(y.n, y2.n, p.n, ctx))
     {
-        EC_POINT_set_affine_coordinates(group->ec_group, point, x.n, y.n, ctx);
+        int flag = EC_POINT_set_affine_coordinates(group->ec_group, point, x.n, y.n, ctx);
+        if (flag == 0)
+        {
+            std::cout << "Error: set affine coord" << std::endl;
+            exit(1);
+        }
+        if (!is_on_curve())
+        {
+            std::cout << "Error: HashToCurve didn't generate a point on the curve" << std::endl;
+            exit(1);
+        }
         std::cout << "SQRT succedded!" << std::endl;
         return;
     }
@@ -209,6 +220,27 @@ void Point::fromHash(Group *g, BigInt x)
     }
     x = x.add(incr);
     fromHash(g, x);
+}
+
+BigInt Point::toHash()
+{
+    BigInt x, y;
+    EC_POINT_get_affine_coordinates(group->ec_group, point, x.n, y.n, group->bn_ctx);
+    unsigned char xbin[BN_num_bytes(x.n)];
+    unsigned char ybin[BN_num_bytes(y.n)];
+    BN_bn2bin(x.n, xbin);
+    BN_bn2bin(y.n, ybin);
+
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA224_Update(&sha256, xbin, sizeof(xbin));
+    SHA224_Update(&sha256, ybin, sizeof(ybin));
+    SHA256_Final(hash, &sha256);
+
+    BigInt ret;
+    BN_bin2bn(hash, sizeof(hash), ret.n);
+    return ret;
 }
 
 bool Point::is_on_curve()

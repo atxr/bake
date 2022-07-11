@@ -60,6 +60,7 @@ public:
     size_t size();
     void from_bin(Group *g, const unsigned char *buf, size_t buf_len);
     void fromHash(Group *g, BigInt hash);
+    BigInt toHash();
 
     Point add(Point &rhs);
     //		Point sub(Point & rhs);
