@@ -72,6 +72,25 @@ BigInt BigInt::mul_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx)
     return ret;
 }
 
+BigInt BigInt::exp_mod(const BigInt &b, Group G)
+{
+    BigInt m;
+    if (EC_GROUP_get_curve(G.ec_group, m.n, nullptr, nullptr, nullptr) == 0)
+    {
+        std::cout << "Error getting the curve parameters" << std::endl;
+        exit(1);
+    }
+
+    return mul_mod(b, m, G.bn_ctx);
+}
+
+BigInt BigInt::exp_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx)
+{
+    BigInt ret;
+    BN_mod_exp(ret.n, n, b.n, m.n, ctx);
+    return ret;
+}
+
 BigInt BigInt::inv_mod(const BigInt &m, BN_CTX *ctx) const
 {
     BigInt ret;
@@ -132,12 +151,14 @@ Point &Point::operator=(Point p)
     return *this;
 }
 
-void Point::print() {
-    BigInt x,y;
+void Point::print()
+{
+    BigInt x, y;
     EC_POINT_get_affine_coordinates(group->ec_group, point, x.n, y.n, group->bn_ctx);
     std::cout << "x = 0x";
     BN_print_fp(stdout, x.n);
-    std::cout << std::endl << "y = 0x";
+    std::cout << std::endl
+              << "y = 0x";
     BN_print_fp(stdout, y.n);
     std::cout << std::endl;
 }
