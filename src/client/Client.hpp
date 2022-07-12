@@ -9,6 +9,8 @@ public:
     bool enroll(FuzzyVault vault);
 
 private:
+    Point generatePublicKey(FuzzyVault vault);
+
     ComputationServer cs;
     int id;
     Group *G;

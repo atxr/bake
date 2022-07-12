@@ -12,6 +12,21 @@ bool Client::init() {
 
 bool Client::enroll(FuzzyVault vault)
 {
+    Point cpk_r = generatePublicKey(vault);
+    if (cpk_r.is_empty()) {
+        return false;
+    }
+
+    std::cout << "Storing" << std::endl;
+    bool st = cs.store(vault, id, cpk_r);
+    if (!st) {
+        std::cout << "Failed: Storing" << std::endl;
+    }
+    return st;
+}
+
+Point Client::generatePublicKey(FuzzyVault vault) 
+{
     // BigInt f0 = vault.getf0();
 
     // Generate a random f0 at the moment
@@ -29,16 +44,11 @@ bool Client::enroll(FuzzyVault vault)
     if (r1.is_empty())
     {
         std::cout << "Failed: r1 is empty" << std::endl;
-        return false;
+        return Point();
     }
 
     Point r2 = unblind(r1, b);
-    BigInt csk_r = r2.toHash();
-    Point cpk_r = blind(h, csk_r); // cpk_r = h^csk_r
-    std::cout << "Storing" << std::endl;
-    bool st = cs.store(vault, id, cpk_r);
-    if (!st) {
-        std::cout << "Failed: Storing" << std::endl;
-    }
-    return st;
+    BigInt csk = r2.toHash();
+    Point cpk = blind(h, csk); // cpk_r = h^csk_r
+    return cpk;
 }
