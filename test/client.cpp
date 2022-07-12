@@ -11,9 +11,14 @@ int main() {
     ComputationServer cs(as);
 
     // Create a client
-    Client c(0, FuzzyVault()); 
-    if (c.enroll(cs)) {
-        cout << "Enrollment successful" << endl;
+    Client c(cs); 
+    if (!c.init()) {
+        cout << "Error during init" << endl;
+        exit(1);
     }
+    if (!c.enroll(FuzzyVault())) {
+        cout << "Enrollment failed" << endl;
+    }
+    cout << "Enrollment successful!" << endl;
     return 0;
 }
