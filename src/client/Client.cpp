@@ -1,21 +1,26 @@
 #include "Client.hpp"
 #include <iostream>
 
-Client::Client(int id, FuzzyVault vault) : id(id), vault(vault) {}
+Client::Client(ComputationServer cs) : cs(cs) {}
 
-bool Client::enroll(ComputationServer cs)
+bool Client::init() {
+    id = cs.getClientId();
+    G = cs.getGroup();
+    return true;
+}
+
+bool Client::enroll(FuzzyVault vault)
 {
-    Group G;
     // BigInt f0 = vault.getf0();
 
     // Generate a random f0 at the moment
     BigInt f0;
-    G.get_rand_bn(f0);
+    G->get_rand_bn(f0);
 
     Point g;
-    g.fromHash(&G, f0);
+    g.fromHash(G, f0);
     BigInt b;
-    G.get_rand_bn(b);
+    G->get_rand_bn(b);
     Point r = blind(g, b);
     
     std::cout << "Signing" << std::endl;

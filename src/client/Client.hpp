@@ -4,10 +4,12 @@
 class Client
 {
 public:
-    Client(int id, FuzzyVault vault);
-    bool enroll(ComputationServer cs);
+    Client(ComputationServer cs);
+    bool init();
+    bool enroll(FuzzyVault vault);
 
 private:
+    ComputationServer cs;
     int id;
-    FuzzyVault vault;
+    Group *G;
 };
