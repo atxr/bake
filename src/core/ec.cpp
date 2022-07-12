@@ -350,6 +350,13 @@ void Group::get_rand_bn(BigInt &n)
     BN_rand_range(n.n, order.n);
 }
 
+void Group::get_rand_point(Point &p)
+{
+    BigInt r;
+    get_rand_bn(r);
+    p.fromHash(this, r);
+}
+
 Point Group::get_generator()
 {
     Point res(this);

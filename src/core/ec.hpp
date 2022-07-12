@@ -91,6 +91,7 @@ public:
     ~Group();
     void resize_scratch(size_t size);
     void get_rand_bn(BigInt &n);
+    void get_rand_point(Point &n);
     Point get_generator();
     Point mul_gen(const BigInt &m);
 };
