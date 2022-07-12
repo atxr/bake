@@ -1,6 +1,8 @@
 #include "ComputationServer.hpp"
 
-ComputationServer::ComputationServer(AuthenticationServer as) : as(as) {}
+Group* ComputationServer::getGroup() { return as.getGroup(); }
+Point ComputationServer::getPublicGenerator() { return h; }
+unsigned int ComputationServer::getClientId() { return 0; } // TODO tmp
 
 Point ComputationServer::sign(FuzzyVault vault, unsigned int id, Point r)
 {

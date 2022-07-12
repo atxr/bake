@@ -5,6 +5,7 @@ class AuthenticationServer
 {
 public:
     AuthenticationServer(Group G);
+    Group* getGroup();
     Point sign(Point r);
 
 private:

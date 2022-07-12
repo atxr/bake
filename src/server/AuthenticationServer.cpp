@@ -8,6 +8,9 @@ AuthenticationServer::AuthenticationServer(Group G) : G(G)
     s = BigInt(rand);
 }
 
-Point AuthenticationServer::sign(Point r) {
+Group *AuthenticationServer::getGroup() { return &G; }
+
+Point AuthenticationServer::sign(Point r)
+{
     return blind(r, s);
 }
