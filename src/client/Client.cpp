@@ -6,6 +6,7 @@ Client::Client(ComputationServer cs) : cs(cs) {}
 bool Client::init() {
     id = cs.getClientId();
     G = cs.getGroup();
+    h = cs.getPublicGenerator();
     return true;
 }
 
@@ -33,9 +34,7 @@ bool Client::enroll(FuzzyVault vault)
 
     Point r2 = unblind(r1, b);
     BigInt csk_r = r2.toHash();
-    BigInt h;
-    G.get_rand_bn(h);
-    BigInt cpk_r = h.exp_mod(csk_r, G); //= h^csk_r;
+    Point cpk_r = blind(h, csk_r); // cpk_r = h^csk_r
     std::cout << "Storing" << std::endl;
     bool st = cs.store(vault, id, cpk_r);
     if (!st) {

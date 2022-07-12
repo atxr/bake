@@ -12,4 +12,5 @@ private:
     ComputationServer cs;
     int id;
     Group *G;
+    Point h;
 };
