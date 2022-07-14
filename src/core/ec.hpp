@@ -41,6 +41,7 @@ public:
     BigInt exp_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx);
     BigInt exp_mod(const BigInt &b, Group G);
     BigInt inv_mod(const BigInt &m, BN_CTX *ctx) const;
+    bool const &operator==(BigInt const oth);
 };
 
 /**
