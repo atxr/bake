@@ -119,9 +119,10 @@ BigInt BigInt::mod(const BigInt &oth, BN_CTX *ctx)
     return ret;
 }
 
-bool const &BigInt::operator==(BigInt const oth)
+bool BigInt::operator==(BigInt &oth)
 {
-    return 0 == BN_cmp(n, oth.n);
+    int ret = BN_cmp(n, oth.n);
+    return (ret == 0);
 }
 
 Point::Point(Group *g)
