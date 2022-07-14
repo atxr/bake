@@ -3,52 +3,60 @@
 
 Client::Client(ComputationServer cs) : cs(cs) {}
 
-bool Client::init() {
-    id = cs.getClientId();
+bool Client::init()
+{
     G = cs.getGroup();
     h = cs.getPublicGenerator();
+
+    // Generate a random f0 at the moment
+    G->get_rand_bn(tempf0);
     return true;
 }
 
 bool Client::enroll(FuzzyVault vault)
 {
-    Point cpk_r = generatePublicKey(vault);
-    if (cpk_r.is_empty()) {
-        return false;
-    }
+    // ask to the cs an id with a given vault
+    // verify that the vault isn't already registered 
+    // and get a new id
+    // cs stores the pair id,vault temporarly
+    // and waits for the cpk_r to store it definitively 
+    id = cs.getClientId(vault);
+
+    // BigInt f0 = vault.getf0();
+    // use the temporary stored f0
+    BigInt f0 = tempf0;
+
+    BigInt csk_r = generateSecretKey(f0);
+    // TODO error catch
+    Point cpk_r = h.mul(csk_r);
 
     std::cout << "Storing" << std::endl;
     bool st = cs.store(vault, id, cpk_r);
-    if (!st) {
+    if (!st)
+    {
         std::cout << "Failed: Storing" << std::endl;
     }
     return st;
 }
 
-Point Client::generatePublicKey(FuzzyVault vault) 
+BigInt Client::generateSecretKey(BigInt f0)
 {
-    // BigInt f0 = vault.getf0();
-
-    // Generate a random f0 at the moment
-    BigInt f0;
-    G->get_rand_bn(f0);
-
     Point g;
     g.fromHash(G, f0);
     BigInt b;
     G->get_rand_bn(b);
     Point r = blind(g, b);
-    
+
     std::cout << "Signing" << std::endl;
-    Point r1 = cs.sign(vault, id, r);
+    Point r1 = cs.sign(r);
     if (r1.is_empty())
     {
         std::cout << "Failed: r1 is empty" << std::endl;
-        return Point();
+        return BigInt();
     }
 
     Point r2 = unblind(r1, b);
     BigInt csk = r2.toHash();
-    Point cpk = blind(h, csk); // cpk_r = h^csk_r
-    return cpk;
+    return csk;
+}
 }

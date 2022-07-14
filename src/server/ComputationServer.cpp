@@ -2,14 +2,15 @@
 
 ComputationServer::ComputationServer(AuthenticationServer as) : as(as)
 {
-    as.getGroup()->get_rand_point(h);
+    G = as.getGroup();
+    G->get_rand_point(h);
 }
 
-Group* ComputationServer::getGroup() { return as.getGroup(); }
+Group *ComputationServer::getGroup() { return as.getGroup(); }
 Point ComputationServer::getPublicGenerator() { return h; }
-unsigned int ComputationServer::getClientId() { return 0; } // TODO tmp
+unsigned int ComputationServer::getClientId(FuzzyVault vault) { return 0; } // TODO tmp
 
-Point ComputationServer::sign(FuzzyVault vault, unsigned int id, Point r)
+Point ComputationServer::sign(Point r)
 {
     return as.sign(r);
 }

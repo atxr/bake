@@ -9,10 +9,13 @@ public:
     bool enroll(FuzzyVault vault);
 
 private:
-    Point generatePublicKey(FuzzyVault vault);
+    BigInt generateSecretKey(BigInt f0);
 
     ComputationServer cs;
     int id;
     Group *G;
     Point h;
+    
+    // temporary stored f0
+    BigInt tempf0;
 };
