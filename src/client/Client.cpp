@@ -16,15 +16,18 @@ bool Client::init()
 bool Client::enroll(FuzzyVault vault)
 {
     // ask to the cs an id with a given vault
-    // verify that the vault isn't already registered 
+    // verify that the vault isn't already registered
     // and get a new id
     // cs stores the pair id,vault temporarly
-    // and waits for the cpk_r to store it definitively 
+    // and waits for the cpk_r to store it definitively
     id = cs.getClientId(vault);
 
     // BigInt f0 = vault.getf0();
     // use the temporary stored f0
     BigInt f0 = tempf0;
+    std::cout << "f0 enroll: 0x";
+    BN_print_fp(stdout, f0.n);
+    std::cout << std::endl;
 
     BigInt csk_r = generateSecretKey(f0);
     // TODO error catch
@@ -64,8 +67,13 @@ bool Client::verify(Query Q)
 {
     FuzzyVault vault = cs.getVault(id);
     // BigInt f0 = vault.getf0(Q);
-    // use the temporary stored f0 
+    // use the temporary stored f0
     BigInt f0 = tempf0;
+    // or use a random f0 (must fail)
+    // G->get_rand_bn(f0);
+    std::cout << "f0 enroll: 0x";
+    BN_print_fp(stdout, f0.n);
+    std::cout << std::endl;
 
     // Generate the probe key pair
     // TODO error catch
@@ -84,15 +92,20 @@ bool Client::verify(Query Q)
     {
         std::cout << "Failed during the exchange" << std::endl;
     }
-    
 
-    // compute the final client key 
-    // TODO compute hashKeychain
+    // compute the final client key
     BigInt kc = hashKeychain(sKeychain.spk_e.mul(csk_e),
                              sKeychain.spk.mul(csk_e),
                              sKeychain.spk_e.mul(csk_p),
-                             cpk_e, sKeychain.spk_e, cpk_p, sKeychain.spk);
+                             cpk_e, sKeychain.spk_e,
+                             cpk_p, sKeychain.spk);
 
     // compare the final keys
+    std::cout << "kc enroll: 0x";
+    BN_print_fp(stdout, kc.n);
+    std::cout << std::endl;
+    std::cout << "ks enroll: 0x";
+    BN_print_fp(stdout, sKeychain.ks.n);
+    std::cout << std::endl;
     return kc == sKeychain.ks;
 }
