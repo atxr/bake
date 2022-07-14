@@ -5,6 +5,12 @@
 
 using StoredClient = std::pair<FuzzyVault, Point>;
 
+struct ServerKeychain {
+    Point spk, spk_e;
+    BigInt ks; 
+    bool st;
+}; 
+
 class ComputationServer
 {
 public:
@@ -12,6 +18,8 @@ public:
     Group* getGroup();
     Point getPublicGenerator();
     unsigned int getClientId(FuzzyVault vault);
+    FuzzyVault getVault(unsigned int id);
+    ServerKeychain getServerKeychain(unsigned int id, Point cpk_e);
     Point sign(Point r);
     bool store(FuzzyVault vault, unsigned int id, Point cpk_r);
 
