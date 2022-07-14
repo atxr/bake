@@ -7,6 +7,7 @@ public:
     Client(ComputationServer cs);
     bool init();
     bool enroll(FuzzyVault vault);
+    bool verify(Query Q);
 
 private:
     BigInt generateSecretKey(BigInt f0);

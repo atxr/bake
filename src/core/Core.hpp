@@ -10,3 +10,4 @@ Point unblind(const Point b, const BigInt r);
 BigInt hashKeychain(Point k1, Point k2, Point k3, Point k4, Point k5, Point k6, Point k7);
 
 class FuzzyVault{};
+class Query{};
