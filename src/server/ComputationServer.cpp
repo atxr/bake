@@ -8,7 +8,6 @@ ComputationServer::ComputationServer(AuthenticationServer as) : as(as)
 
 Group *ComputationServer::getGroup() { return as.getGroup(); }
 Point ComputationServer::getPublicGenerator() { return G; }
-unsigned int ComputationServer::getClientId(FuzzyVault vault) { return 0; } // TODO tmp
 FuzzyVault ComputationServer::getVault(unsigned int id) { return clients[id]->first; } // TODO tmp
 
 ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e)
@@ -34,12 +33,12 @@ ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e
     keychain.Spk = Spk;
     keychain.Spk_e = Spk_e;
     keychain.ks = ks;
-    keychain.st = true;
     return keychain;
 }
 
-Point ComputationServer::sign(Point B)
+Point ComputationServer::signToEnroll(FuzzyVault vault, Point B, unsigned int id)
 {
+    // TODO store temp vault and id
     return as.sign(B);
 }
 
@@ -47,4 +46,14 @@ bool ComputationServer::store(FuzzyVault vault, unsigned int id, Point Cpk_r)
 {
     clients[id] = new StoredClient(vault, Cpk_r);
     return true;
+}
+
+ServerKeychain ComputationServer::signToVerify(unsigned int id, Point B, Point Cpk_e)
+{
+    // TODO resend id isoke?
+    ServerKeychain keychain = getServerKeychain(id, Cpk_e);
+    
+    keychain.S = as.sign(B);
+    keychain.st = true;
+    return keychain;
 }

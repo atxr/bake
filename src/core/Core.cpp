@@ -30,6 +30,7 @@ Point unblind(const Point B, const BigInt r)
 
 BigInt KDF(Point K1, Point K2, Point K3, Point K4, Point K5, Point K6, Point K7)
 {
+    // TODO KDF function with concat of all coordinates
     Point P(K1);
     Point k[6] = {K2, K3, K4, K5, K6, K7};
     for (int i = 0; i < 6; i++)

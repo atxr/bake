@@ -333,7 +333,7 @@ Group::Group()
 
 Group::~Group()
 {
-    // TODO MEMORY LEAK...
+    // FIXME MEMORY LEAK...
     // if (ec_group != nullptr)
     //     EC_GROUP_free(ec_group);
 

@@ -10,8 +10,6 @@ public:
     bool verify(Query query);
 
 private:
-    BigInt generateSecretKey(BigInt f0);
-
     ComputationServer cs;
     int id;
     Group *ECGroup;

@@ -15,12 +15,8 @@ bool Client::init()
 
 bool Client::enroll(FuzzyVault vault)
 {
-    // ask to the cs an id with a given vault
-    // verify that the vault isn't already registered
-    // and get a new id
-    // cs stores the pair id,vault temporarly
-    // and waits for the Cpk_r to store it definitively
-    id = cs.getClientId(vault);
+    // TODO compute smarter id like the hash of the fuzzy vault? or a random one?
+    id = 0;
 
     // BigInt x = vault.getf0();
     // use the temporary stored x
@@ -29,10 +25,28 @@ bool Client::enroll(FuzzyVault vault)
     BN_print_fp(stdout, x.n);
     std::cout << std::endl;
 
-    BigInt csk_r = generateSecretKey(x);
-    // TODO error catch
+    // Generate blinded point B
+    Point X;
+    X.fromHash(ECGroup, x);
+    BigInt r;
+    ECGroup->get_rand_bn(r);
+    Point B = blind(X, r);
+
+    // First communication with the computation server
+    std::cout << "Signing" << std::endl;
+    Point S = cs.signToEnroll(vault, B, id);
+    if (S.is_empty())
+    {
+        std::cout << "Failed: S is empty" << std::endl;
+        return false;
+    }
+
+    // Compute key pair from the signed point
+    Point U = unblind(S, r);
+    BigInt csk_r = U.toHash();
     Point Cpk_r = G.mul(csk_r);
 
+    // Second communication with the computation server
     std::cout << "Storing" << std::endl;
     bool st = cs.store(vault, id, Cpk_r);
     if (!st)
@@ -42,30 +56,13 @@ bool Client::enroll(FuzzyVault vault)
     return st;
 }
 
-BigInt Client::generateSecretKey(BigInt x)
-{
-    Point X;
-    X.fromHash(ECGroup, x);
-    BigInt r;
-    ECGroup->get_rand_bn(r);
-    Point B = blind(X, r);
-
-    std::cout << "Signing" << std::endl;
-    Point S = cs.sign(B);
-    if (S.is_empty())
-    {
-        std::cout << "Failed: S is empty" << std::endl;
-        return BigInt();
-    }
-
-    Point U = unblind(S, r);
-    BigInt csk = U.toHash();
-    return csk;
-}
-
 bool Client::verify(Query Q)
 {
+    // First communication with the server
+    std::cout << "Get vault stored on the computation server" << std::endl;
+    // TODO catch error
     FuzzyVault vault = cs.getVault(id);
+
     // BigInt x = vault.getf0(Q);
     // use the temporary stored x
     BigInt x = tempf0;
@@ -75,25 +72,33 @@ bool Client::verify(Query Q)
     BN_print_fp(stdout, x.n);
     std::cout << std::endl;
 
-    // Generate the probe key pair
-    // TODO error catch
-    BigInt csk_p = generateSecretKey(x);
-    Point Cpk_p = G.mul(csk_p);
+    // Generate the blinded point
+    Point X;
+    X.fromHash(ECGroup, x);
+    BigInt r;
+    ECGroup->get_rand_bn(r);
+    Point B = blind(X, r);
 
-    // Generate new exchange key pair
+    // Generate a new exchange key pair
     BigInt csk_e;
     ECGroup->get_rand_bn(csk_e);
     Point Cpk_e = G.mul(csk_e);
 
-    // send the exchange public key to the computation server and get the server keychain
-    std::cout << "Exchanging keys" << std::endl;
-    ServerKeychain sKeychain = cs.getServerKeychain(id, Cpk_e);
-    if (!sKeychain.st)
+    // Second communication with the server
+    std::cout << "Get signed server keychain" << std::endl;
+    ServerKeychain sKeychain = cs.signToVerify(id, B, Cpk_e);
+    if (sKeychain.st == false)
     {
-        std::cout << "Failed during the exchange" << std::endl;
+        std::cout << "Failed: server keychain signing failed" << std::endl;
+        return false;
     }
 
-    // compute the final client key
+    // unblind the signed point
+    Point U = unblind(sKeychain.S, r);
+    BigInt csk_p = U.toHash();
+    Point Cpk_p = G.mul(csk_p);
+
+    // compute kc
     BigInt kc = KDF(sKeychain.Spk_e.mul(csk_e),
                              sKeychain.Spk.mul(csk_e),
                              sKeychain.Spk_e.mul(csk_p),
