@@ -31,6 +31,7 @@ public:
 
     int size();
     void to_bin(unsigned char *in);
+    BigInt toHash();
     void from_bin(const unsigned char *in, int length);
 
     BigInt add(const BigInt &oth);

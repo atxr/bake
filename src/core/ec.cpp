@@ -55,6 +55,23 @@ void BigInt::to_bin(unsigned char *in)
     BN_bn2bin(n, in);
 }
 
+BigInt BigInt::toHash()
+{
+    unsigned char bin[BN_num_bytes(n)];
+    BN_bn2bin(n, bin);
+
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA224_Update(&sha256, bin, sizeof(bin));
+    SHA256_Final(hash, &sha256);
+
+    BigInt ret;
+    BN_bin2bn(hash, sizeof(hash), ret.n);
+    return ret;
+}
+
+
 void BigInt::from_bin(const unsigned char *in, int length)
 {
     BN_free(n);
