@@ -5,11 +5,11 @@ Client::Client(ComputationServer cs) : cs(cs) {}
 
 bool Client::init()
 {
-    G = cs.getGroup();
-    h = cs.getPublicGenerator();
+    ECGroup = cs.getGroup();
+    G = cs.getPublicGenerator();
 
-    // Generate a random f0 at the moment
-    G->get_rand_bn(tempf0);
+    // Generate a random x at the moment
+    ECGroup->get_rand_bn(tempf0);
     return true;
 }
 
@@ -19,22 +19,22 @@ bool Client::enroll(FuzzyVault vault)
     // verify that the vault isn't already registered
     // and get a new id
     // cs stores the pair id,vault temporarly
-    // and waits for the cpk_r to store it definitively
+    // and waits for the Cpk_r to store it definitively
     id = cs.getClientId(vault);
 
-    // BigInt f0 = vault.getf0();
-    // use the temporary stored f0
-    BigInt f0 = tempf0;
-    std::cout << "f0 enroll: 0x";
-    BN_print_fp(stdout, f0.n);
+    // BigInt x = vault.getf0();
+    // use the temporary stored x
+    BigInt x = tempf0;
+    std::cout << "x enroll: 0x";
+    BN_print_fp(stdout, x.n);
     std::cout << std::endl;
 
-    BigInt csk_r = generateSecretKey(f0);
+    BigInt csk_r = generateSecretKey(x);
     // TODO error catch
-    Point cpk_r = h.mul(csk_r);
+    Point Cpk_r = G.mul(csk_r);
 
     std::cout << "Storing" << std::endl;
-    bool st = cs.store(vault, id, cpk_r);
+    bool st = cs.store(vault, id, Cpk_r);
     if (!st)
     {
         std::cout << "Failed: Storing" << std::endl;
@@ -42,69 +42,69 @@ bool Client::enroll(FuzzyVault vault)
     return st;
 }
 
-BigInt Client::generateSecretKey(BigInt f0)
+BigInt Client::generateSecretKey(BigInt x)
 {
-    Point g;
-    g.fromHash(G, f0);
-    BigInt b;
-    G->get_rand_bn(b);
-    Point r = blind(g, b);
+    Point X;
+    X.fromHash(ECGroup, x);
+    BigInt r;
+    ECGroup->get_rand_bn(r);
+    Point B = blind(X, r);
 
     std::cout << "Signing" << std::endl;
-    Point r1 = cs.sign(r);
-    if (r1.is_empty())
+    Point S = cs.sign(B);
+    if (S.is_empty())
     {
-        std::cout << "Failed: r1 is empty" << std::endl;
+        std::cout << "Failed: S is empty" << std::endl;
         return BigInt();
     }
 
-    Point r2 = unblind(r1, b);
-    BigInt csk = r2.toHash();
+    Point U = unblind(S, r);
+    BigInt csk = U.toHash();
     return csk;
 }
 
 bool Client::verify(Query Q)
 {
     FuzzyVault vault = cs.getVault(id);
-    // BigInt f0 = vault.getf0(Q);
-    // use the temporary stored f0
-    BigInt f0 = tempf0;
-    // or use a random f0 (must fail)
-    // G->get_rand_bn(f0);
-    std::cout << "f0 enroll: 0x";
-    BN_print_fp(stdout, f0.n);
+    // BigInt x = vault.getf0(Q);
+    // use the temporary stored x
+    BigInt x = tempf0;
+    // or use a random x (must fail)
+    // ECGroup->get_rand_bn(x);
+    std::cout << "x enroll: 0x";
+    BN_print_fp(stdout, x.n);
     std::cout << std::endl;
 
     // Generate the probe key pair
     // TODO error catch
-    BigInt csk_p = generateSecretKey(f0);
-    Point cpk_p = h.mul(csk_p);
+    BigInt csk_p = generateSecretKey(x);
+    Point Cpk_p = G.mul(csk_p);
 
     // Generate new exchange key pair
     BigInt csk_e;
-    G->get_rand_bn(csk_e);
-    Point cpk_e = h.mul(csk_e);
+    ECGroup->get_rand_bn(csk_e);
+    Point Cpk_e = G.mul(csk_e);
 
     // send the exchange public key to the computation server and get the server keychain
     std::cout << "Exchanging keys" << std::endl;
-    ServerKeychain sKeychain = cs.getServerKeychain(id, cpk_e);
+    ServerKeychain sKeychain = cs.getServerKeychain(id, Cpk_e);
     if (!sKeychain.st)
     {
         std::cout << "Failed during the exchange" << std::endl;
     }
 
     // compute the final client key
-    BigInt kc = hashKeychain(sKeychain.spk_e.mul(csk_e),
-                             sKeychain.spk.mul(csk_e),
-                             sKeychain.spk_e.mul(csk_p),
-                             cpk_e, sKeychain.spk_e,
-                             cpk_p, sKeychain.spk);
+    BigInt kc = KDF(sKeychain.Spk_e.mul(csk_e),
+                             sKeychain.Spk.mul(csk_e),
+                             sKeychain.Spk_e.mul(csk_p),
+                             Cpk_e, sKeychain.Spk_e,
+                             Cpk_p, sKeychain.Spk);
 
     // compare the final keys
-    std::cout << "kc enroll: 0x";
+    std::cout << "H(kc) : 0x";
     BN_print_fp(stdout, kc.n);
     std::cout << std::endl;
-    std::cout << "ks enroll: 0x";
+    std::cout << "H(ks) : 0x";
     BN_print_fp(stdout, sKeychain.ks.n);
     std::cout << std::endl;
     return kc == sKeychain.ks;

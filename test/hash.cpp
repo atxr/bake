@@ -7,17 +7,17 @@ using namespace std;
 int main()
 {
     // Test hashToCurve
-    Group G;
+    Group ECGroup;
     BigInt hash, r;
-    G.get_rand_bn(hash);
-    G.get_rand_bn(r);
+    ECGroup.get_rand_bn(hash);
+    ECGroup.get_rand_bn(r);
 
-    Point p;
-    p.fromHash(&G, hash);
+    Point P;
+    P.fromHash(&ECGroup, hash);
 
-    if (p.is_on_curve())
+    if (P.is_on_curve())
     {
-        std::cout << "HashToCurve generated a point p on the curve" << std::endl;
+        std::cout << "HashToCurve generated a point P on the curve" << std::endl;
     }
     else
     {
@@ -25,8 +25,8 @@ int main()
     }
 
     // Test curveToHash
-    BigInt hash2 = p.toHash();
-    std::cout << "Hashing point p ... " << endl;
+    BigInt hash2 = P.toHash();
+    std::cout << "Hashing point P ... " << endl;
     BN_print_fp(stdout, hash2.n);
     std::cout << std::endl;
     return 0;

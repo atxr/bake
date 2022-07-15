@@ -7,15 +7,15 @@ public:
     Client(ComputationServer cs);
     bool init();
     bool enroll(FuzzyVault vault);
-    bool verify(Query Q);
+    bool verify(Query query);
 
 private:
     BigInt generateSecretKey(BigInt f0);
 
     ComputationServer cs;
     int id;
-    Group *G;
-    Point h;
+    Group *ECGroup;
+    Point G;
     
     // temporary stored f0
     BigInt tempf0;

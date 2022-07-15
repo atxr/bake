@@ -5,17 +5,17 @@
 using namespace std;
 
 int main() {
-    Group G;
+    Group ECGroup;
     BigInt hash, r;
-    G.get_rand_bn(hash);
-    G.get_rand_bn(r);
+    ECGroup.get_rand_bn(hash);
+    ECGroup.get_rand_bn(r);
 
-    Point p;
-    p.fromHash(&G, hash);
+    Point P;
+    P.fromHash(&ECGroup, hash);
 
-    Point b = blind(p, r);
-    Point u = unblind(b, r);
-    if (p != b && p == u) {
+    Point B = blind(P, r);
+    Point U = unblind(B, r);
+    if (P != B && P == U) {
         cout << "Blinding OK" << endl;
     }
     return 0;

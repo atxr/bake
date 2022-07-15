@@ -1,16 +1,14 @@
 #include "AuthenticationServer.hpp"
 
-AuthenticationServer::AuthenticationServer(Group G) : G(G)
+AuthenticationServer::AuthenticationServer(Group ECGroup) : ECGroup(ECGroup)
 {
-    BigInt rand;
     // TODO: Is that random function secure?
-    G.get_rand_bn(rand);
-    s = BigInt(rand);
+    ECGroup.get_rand_bn(k);
 }
 
-Group *AuthenticationServer::getGroup() { return &G; }
+Group *AuthenticationServer::getGroup() { return &ECGroup; }
 
-Point AuthenticationServer::sign(Point r)
+Point AuthenticationServer::sign(Point B)
 {
-    return blind(r, s);
+    return blind(B, k);
 }

@@ -6,9 +6,9 @@ using namespace std;
 
 int main()
 {
-    Group G;
+    Group ECGroup;
     // Init the servers
-    AuthenticationServer as(G);
+    AuthenticationServer as(ECGroup);
     ComputationServer cs(as);
 
     // Create a client

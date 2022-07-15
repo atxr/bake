@@ -26,16 +26,19 @@ BigInt::BigInt()
 {
     n = BN_new();
 }
+
 BigInt::BigInt(const BigInt &oth)
 {
     n = BN_new();
     BN_copy(n, oth.n);
 }
+
 BigInt &BigInt::operator=(BigInt oth)
 {
     std::swap(n, oth.n);
     return *this;
 }
+
 BigInt::~BigInt()
 {
     if (n != nullptr)
@@ -72,16 +75,16 @@ BigInt BigInt::mul_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx)
     return ret;
 }
 
-BigInt BigInt::exp_mod(const BigInt &b, Group G)
+BigInt BigInt::exp_mod(const BigInt &b, Group ECGroup)
 {
     BigInt m;
-    if (EC_GROUP_get_curve(G.ec_group, m.n, nullptr, nullptr, nullptr) == 0)
+    if (EC_GROUP_get_curve(ECGroup.ec_group, m.n, nullptr, nullptr, nullptr) == 0)
     {
         std::cout << "Error getting the curve parameters" << std::endl;
         exit(1);
     }
 
-    return mul_mod(b, m, G.bn_ctx);
+    return mul_mod(b, m, ECGroup.bn_ctx);
 }
 
 BigInt BigInt::exp_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx)
@@ -125,11 +128,11 @@ bool BigInt::operator==(BigInt &oth)
     return (ret == 0);
 }
 
-Point::Point(Group *g)
+Point::Point(Group *ECGroup)
 {
-    if (g == nullptr)
+    if (ECGroup == nullptr)
         return;
-    this->group = g;
+    this->group = ECGroup;
     point = EC_POINT_new(group->ec_group);
 }
 
@@ -139,21 +142,21 @@ Point::~Point()
         EC_POINT_free(point);
 }
 
-Point::Point(const Point &p)
+Point::Point(const Point &P)
 {
-    if (p.group == nullptr)
+    if (P.group == nullptr)
         return;
-    this->group = p.group;
+    this->group = P.group;
     point = EC_POINT_new(group->ec_group);
-    int ret = EC_POINT_copy(point, p.point);
+    int ret = EC_POINT_copy(point, P.point);
     if (ret == 0)
         error("ECC COPY");
 }
 
-Point &Point::operator=(Point p)
+Point &Point::operator=(Point P)
 {
-    std::swap(p.point, point);
-    std::swap(p.group, group);
+    std::swap(P.point, point);
+    std::swap(P.group, group);
     return *this;
 }
 
@@ -184,11 +187,11 @@ size_t Point::size()
     return ret;
 }
 
-void Point::from_bin(Group *g, const unsigned char *buf, size_t buf_len)
+void Point::from_bin(Group *ECGroup, const unsigned char *buf, size_t buf_len)
 {
     if (point == nullptr)
     {
-        group = g;
+        group = ECGroup;
         point = EC_POINT_new(group->ec_group);
     }
     int ret = EC_POINT_oct2point(group->ec_group, point, buf, buf_len, group->bn_ctx);
@@ -196,21 +199,21 @@ void Point::from_bin(Group *g, const unsigned char *buf, size_t buf_len)
         error("ECC FROM_BIN");
 }
 
-void Point::fromHash(Group *g, BigInt x)
+void Point::fromHash(Group *ECGroup, BigInt x)
 {
     if (point == nullptr)
     {
-        group = g;
+        group = ECGroup;
         point = EC_POINT_new(group->ec_group);
     }
 
     BigInt a;
     BigInt b;
-    BigInt p;
+    BigInt m;
     BN_CTX *ctx = group->bn_ctx;
 
     // TODO nicer assertion with logs
-    if (EC_GROUP_get_curve(g->ec_group, p.n, a.n, b.n, nullptr) == 0)
+    if (EC_GROUP_get_curve(ECGroup->ec_group, m.n, a.n, b.n, nullptr) == 0)
     {
         std::cout << "Error at get curve" << std::endl;
     }
@@ -222,10 +225,10 @@ void Point::fromHash(Group *g, BigInt x)
     // y^2 = x^3 + ax + b
     BigInt y;
     BigInt y2(x);
-    y2 = y2.mul_mod(x, p, ctx).mul_mod(x, p, ctx);
-    a = a.mul_mod(x, p, ctx);
-    y2 = y2.add_mod(a, p, ctx).add_mod(b, p, ctx);
-    if (BN_mod_sqrt(y.n, y2.n, p.n, ctx))
+    y2 = y2.mul_mod(x, m, ctx).mul_mod(x, m, ctx);
+    a = a.mul_mod(x, m, ctx);
+    y2 = y2.add_mod(a, m, ctx).add_mod(b, m, ctx);
+    if (BN_mod_sqrt(y.n, y2.n, m.n, ctx))
     {
         int flag = EC_POINT_set_affine_coordinates(group->ec_group, point, x.n, y.n, ctx);
         if (flag == 0)
@@ -246,7 +249,7 @@ void Point::fromHash(Group *g, BigInt x)
         std::cout << "SQRT failed, adding 1 to hash" << std::endl;
     }
     x = x.add(incr);
-    fromHash(g, x);
+    fromHash(ECGroup, x);
 }
 
 BigInt Point::toHash()
@@ -282,29 +285,29 @@ bool Point::is_empty()
 
 Point Point::add(Point &rhs)
 {
-    Point ret(group);
-    int res = EC_POINT_add(group->ec_group, ret.point, point, rhs.point, group->bn_ctx);
+    Point Ret(group);
+    int res = EC_POINT_add(group->ec_group, Ret.point, point, rhs.point, group->bn_ctx);
     if (res == 0)
         error("ECC ADD");
-    return ret;
+    return Ret;
 }
 
 Point Point::mul(const BigInt &m)
 {
-    Point ret(group);
-    int res = EC_POINT_mul(group->ec_group, ret.point, NULL, point, m.n, group->bn_ctx);
+    Point Ret(group);
+    int res = EC_POINT_mul(group->ec_group, Ret.point, NULL, point, m.n, group->bn_ctx);
     if (res == 0)
         error("ECC MUL");
-    return ret;
+    return Ret;
 }
 
 Point Point::inv()
 {
-    Point ret(*this);
-    int res = EC_POINT_invert(group->ec_group, ret.point, group->bn_ctx);
+    Point Ret(*this);
+    int res = EC_POINT_invert(group->ec_group, Ret.point, group->bn_ctx);
     if (res == 0)
         error("ECC INV");
-    return ret;
+    return Ret;
 }
 
 bool Point::operator==(Point &rhs)
@@ -365,18 +368,18 @@ void Group::get_rand_point(Point &p)
 
 Point Group::get_generator()
 {
-    Point res(this);
-    int ret = EC_POINT_copy(res.point, EC_GROUP_get0_generator(ec_group));
+    Point Res(this);
+    int ret = EC_POINT_copy(Res.point, EC_GROUP_get0_generator(ec_group));
     if (ret == 0)
         error("ECC GEN");
-    return res;
+    return Res;
 }
 
 Point Group::mul_gen(const BigInt &m)
 {
-    Point res(this);
-    int ret = EC_POINT_mul(ec_group, res.point, m.n, NULL, NULL, bn_ctx);
+    Point Res(this);
+    int ret = EC_POINT_mul(ec_group, Res.point, m.n, NULL, NULL, bn_ctx);
     if (ret == 0)
         error("ECC GEN MUL");
-    return res;
+    return Res;
 }

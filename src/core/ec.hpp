@@ -39,7 +39,7 @@ public:
     BigInt add_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx);
     BigInt mul_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx);
     BigInt exp_mod(const BigInt &b, const BigInt &m, BN_CTX *ctx);
-    BigInt exp_mod(const BigInt &b, Group G);
+    BigInt exp_mod(const BigInt &b, Group ECGroup);
     BigInt inv_mod(const BigInt &m, BN_CTX *ctx) const;
     bool operator==(BigInt &oth);
 };
@@ -53,7 +53,7 @@ class Point
 public:
     EC_POINT *point = nullptr;
     Group *group = nullptr;
-    Point(Group *g = nullptr);
+    Point(Group *ECGroup = nullptr);
     ~Point();
     Point(const Point &p);
     Point &operator=(Point p);
@@ -61,19 +61,19 @@ public:
 
     void to_bin(unsigned char *buf, size_t buf_len);
     size_t size();
-    void from_bin(Group *g, const unsigned char *buf, size_t buf_len);
-    void fromHash(Group *g, BigInt hash);
+    void from_bin(Group *ECGroup, const unsigned char *buf, size_t buf_len);
+    void fromHash(Group *ECGroup, BigInt hash);
     BigInt toHash();
 
-    Point add(Point &rhs);
-    //		Point sub(Point & rhs);
+    Point add(Point &Rhs);
+    //		Point sub(Point & Rhs);
     //		bool is_at_infinity();
     bool is_on_curve();
     bool is_empty();
     Point mul(const BigInt &m);
     Point inv();
-    bool operator==(Point &rhs);
-    bool operator!=(Point &rhs);
+    bool operator==(Point &Rhs);
+    bool operator!=(Point &Rhs);
 };
 
 /**
@@ -92,7 +92,7 @@ public:
     ~Group();
     void resize_scratch(size_t size);
     void get_rand_bn(BigInt &n);
-    void get_rand_point(Point &n);
+    void get_rand_point(Point &P);
     Point get_generator();
     Point mul_gen(const BigInt &m);
 };

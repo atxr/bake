@@ -4,11 +4,11 @@
 class AuthenticationServer
 {
 public:
-    AuthenticationServer(Group G);
+    AuthenticationServer(Group ECGroup);
     Group* getGroup();
-    Point sign(Point r);
+    Point sign(Point B);
 
 private:
-    Group G;
-    BigInt s;
+    Group ECGroup;
+    BigInt k;
 };
