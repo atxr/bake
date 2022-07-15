@@ -32,7 +32,7 @@ ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e
 
     keychain.Spk = Spk;
     keychain.Spk_e = Spk_e;
-    keychain.ks = ks;
+    keychain.h_ks = ks.toHash();
     return keychain;
 }
 

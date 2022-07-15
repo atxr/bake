@@ -98,19 +98,20 @@ bool Client::verify(Query Q)
     BigInt csk_p = U.toHash();
     Point Cpk_p = G.mul(csk_p);
 
-    // compute kc
+    // compute kc and H(kc)
     BigInt kc = KDF(sKeychain.Spk_e.mul(csk_e),
                              sKeychain.Spk.mul(csk_e),
                              sKeychain.Spk_e.mul(csk_p),
                              Cpk_e, sKeychain.Spk_e,
                              Cpk_p, sKeychain.Spk);
+    BigInt h_kc = kc.toHash();
 
     // compare the final keys
     std::cout << "H(kc) : 0x";
-    BN_print_fp(stdout, kc.n);
+    BN_print_fp(stdout, h_kc.n);
     std::cout << std::endl;
     std::cout << "H(ks) : 0x";
-    BN_print_fp(stdout, sKeychain.ks.n);
+    BN_print_fp(stdout, sKeychain.h_ks.n);
     std::cout << std::endl;
-    return kc == sKeychain.ks;
+    return h_kc == sKeychain.h_ks;
 }

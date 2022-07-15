@@ -7,7 +7,7 @@ using StoredClient = std::pair<FuzzyVault, Point>;
 
 struct ServerKeychain {
     Point Spk, Spk_e, S;
-    BigInt ks; 
+    BigInt h_ks; 
     bool st;
 }; 
 
