@@ -6,6 +6,7 @@ using namespace std;
 
 int main()
 {
+    cout << "Init" << endl;
     Group ECGroup;
     // Init the servers
     AuthenticationServer as(ECGroup);
@@ -18,14 +19,17 @@ int main()
         cout << "Error during init" << endl;
         exit(1);
     }
+    cout << "Init successful" << endl << endl;
 
+    cout << "Enrollment" << endl;
     if (!c.enroll(FuzzyVault()))
     {
         cout << "Enrollment failed" << endl;
         exit(1);
     }
-    cout << "Enrollment successful!" << endl;
+    cout << "Enrollment successful!" << endl << endl;
     
+    cout << "Verification" << endl;
     if (!c.verify(Query()))
     {
         cout << "Verify: Query failed" << endl;
