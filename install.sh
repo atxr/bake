@@ -1,12 +1,24 @@
 #!/bin/bash
 
+# check if the installation is done for the first time
+if [ ! -d "tmp" ]; then
+  echo "BAKE is already installed on this device."
+  echo -e "To rebuild the app, use the following commands:\n"
+  echo -e "cd build\ncmake..\nmake\n"
+  echo "Otherwise, consider recloning the repo."
+  echo "You can create an issue on https://github.com/atxr/bake if you experience any problem."
+  exit
+fi
+
 # check if openssl is installed
 if ! command -v openssl &> /dev/null
 then
     echo "openssl could not be found"
     echo "please install it"
+    # TODO install it
     exit
 fi
+echo "openssl already installed"
 
 # install thimble lib
 cd tmp
