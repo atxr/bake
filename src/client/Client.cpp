@@ -15,7 +15,7 @@ bool Client::init()
 
 bool Client::enroll(FuzzyVault vault)
 {
-    // TODO compute smarter id like the hash of the fuzzy vault? or a random one?
+    // TODO id++
     id = 0;
 
     // BigInt x = vault.getf0();
