@@ -66,19 +66,19 @@ bool Client::verify(Query Q)
     BigInt x = tempf0;
     // or use a random x (must fail)
     // ECGroup->get_rand_bn(x);
-    std::cout << "x enroll: 0x";
+    std::cout << "x verify: 0x";
     BN_print_fp(stdout, x.n);
     std::cout << std::endl;
 
     // Generate the blinded point
-    BlindedPair bp = blind(x, ECGroup);
-    Point B = bp.first;
-    BigInt r = bp.second;
+    Point B;
+    BigInt r;
+    std::tie(B, r) = blind(x, ECGroup);
 
     // Generate a new exchange key pair
-    KeyPair ck_e = keygen(G, ECGroup);
-    BigInt csk_e = ck_e.first;
-    Point Cpk_e = ck_e.second;
+    BigInt csk_e;
+    Point Cpk_e;
+    std::tie(csk_e, Cpk_e) = keygen(G, ECGroup);
 
     // Second communication with the server
     std::cout << "Get signed server keychain" << std::endl;
@@ -92,14 +92,14 @@ bool Client::verify(Query Q)
     // unblind the signed point
     Point U = unblind(sKeychain.S, r);
     BigInt csk_p = U.toHash();
-    Point Cpk_p = G.mul(csk_p);
+    Point Cpk_p = getPublicKey(csk_p, G);
 
     // compute kc and H(kc)
     BigInt kc = KDF(sKeychain.Spk_e.mul(csk_e),
-                             sKeychain.Spk.mul(csk_e),
-                             sKeychain.Spk_e.mul(csk_p),
-                             Cpk_e, sKeychain.Spk_e,
-                             Cpk_p, sKeychain.Spk);
+                    sKeychain.Spk.mul(csk_e),
+                    sKeychain.Spk_e.mul(csk_p),
+                    Cpk_e, sKeychain.Spk_e,
+                    Cpk_p, sKeychain.Spk);
     BigInt h_kc = kc.toHash();
 
     // compare the final keys

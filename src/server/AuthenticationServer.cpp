@@ -10,5 +10,5 @@ Group *AuthenticationServer::getGroup() { return &ECGroup; }
 
 Point AuthenticationServer::sign(Point B)
 {
-    return B.mul(k);
+    return signPoint(B,k);
 }
