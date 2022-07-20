@@ -13,6 +13,7 @@ set (app
 	test/client.cpp
 	test/blinding.cpp
 	test/hash.cpp
+	test/fuzzyvault.cpp
 )
 set (sources
 	src/core/Core.cpp
