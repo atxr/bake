@@ -25,12 +25,10 @@ bool Client::enroll(FuzzyVault vault)
     BN_print_fp(stdout, x.n);
     std::cout << std::endl;
 
-    // Generate blinded point B
-    Point X;
-    X.fromHash(ECGroup, x);
-    BigInt r;
-    ECGroup->get_rand_bn(r);
-    Point B = blind(X, r);
+    // Generate the blinded point
+    BlindedPair bp = blind(x, ECGroup);
+    Point B = bp.first;
+    BigInt r = bp.second;
 
     // First communication with the computation server
     std::cout << "Signing" << std::endl;
@@ -73,11 +71,9 @@ bool Client::verify(Query Q)
     std::cout << std::endl;
 
     // Generate the blinded point
-    Point X;
-    X.fromHash(ECGroup, x);
-    BigInt r;
-    ECGroup->get_rand_bn(r);
-    Point B = blind(X, r);
+    BlindedPair bp = blind(x, ECGroup);
+    Point B = bp.first;
+    BigInt r = bp.second;
 
     // Generate a new exchange key pair
     KeyPair ck_e = keygen(G, ECGroup);

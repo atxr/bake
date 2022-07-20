@@ -8,11 +8,17 @@
 #include <openssl/sha.h>
 #include "Core.hpp"
 
-Point blind(const Point P, const BigInt r)
+BlindedPair blind(const BigInt x, Group* ECGroup)
 {
-    Point B(P);
-    B = B.mul(r);
-    return B;
+    // Generate X from the hash x
+    Point X;
+    X.fromHash(ECGroup, x);
+
+    // Generate a random blinding BigInt
+    BigInt r;
+    ECGroup->get_rand_bn(r);
+
+    return BlindedPair(X.mul(r), r);
 }
 
 Point unblind(const Point B, const BigInt r)

@@ -7,8 +7,9 @@
 #include "ec.hpp"
 
 using KeyPair = std::pair<BigInt, Point>;
+using BlindedPair = std::pair<Point, BigInt>;
 
-Point blind(const Point P, const BigInt r);
+BlindedPair blind(const BigInt x, Group* ECGroup);
 Point unblind(const Point B, const BigInt r);
 BigInt KDF(Point K1, Point K2, Point K3, Point K4, Point K5, Point K6, Point K7);
 KeyPair keygen(Point P, Group *ECGroup);
