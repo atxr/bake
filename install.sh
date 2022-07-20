@@ -17,7 +17,7 @@ sudo make install
 cd ..
 
 # install fjfx lib
-git clone https://github.com/FingerJetFXOSE/FingerJetFXOSE
+git clone https://github.com/jerem/FingerJetFXOSE
 cd FingerJetFXOSE/FingerJetFXOSE
 ./runCMake.sh x64
 sudo mkdir /usr/local/include/fjfx/
