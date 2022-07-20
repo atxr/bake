@@ -4,6 +4,11 @@ ComputationServer::ComputationServer(AuthenticationServer as) : as(as)
 {
     ECGroup = as.getGroup();
     ECGroup->get_rand_point(G);
+
+    // Generate server key pair
+    KeyPair sk = keygen(ECGroup);
+    ssk = sk.first;
+    Spk = sk.second;
 }
 
 Group *ComputationServer::getGroup() { return as.getGroup(); }
@@ -18,12 +23,10 @@ ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e
     // Recover client stored public key
     Point Cpk_r = clients[id]->second;
 
-    // Generate two key pairs
-    BigInt ssk, ssk_e;
-    ECGroup->get_rand_bn(ssk);
-    ECGroup->get_rand_bn(ssk_e);
-    Point Spk = G.mul(ssk);
-    Point Spk_e = G.mul(ssk_e);
+    // Generate an exchange key pair
+    KeyPair sk_e = keygen(ECGroup);
+    BigInt ssk_e = sk_e.first;
+    Point Spk_e = sk_e.second;
 
     // Compute final key ks
     BigInt ks = KDF(Cpk_e.mul(ssk_e), Cpk_e.mul(ssk),
@@ -50,7 +53,6 @@ bool ComputationServer::store(FuzzyVault vault, unsigned int id, Point Cpk_r)
 
 ServerKeychain ComputationServer::signToVerify(unsigned int id, Point B, Point Cpk_e)
 {
-    // TODO resend id isoke?
     ServerKeychain keychain = getServerKeychain(id, Cpk_e);
     
     keychain.S = as.sign(B);

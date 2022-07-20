@@ -28,4 +28,6 @@ private:
     Group *ECGroup;
     Point G;
     std::unordered_map<int, StoredClient *> clients;
+    BigInt ssk;
+    Point Spk;
 };

@@ -80,9 +80,9 @@ bool Client::verify(Query Q)
     Point B = blind(X, r);
 
     // Generate a new exchange key pair
-    BigInt csk_e;
-    ECGroup->get_rand_bn(csk_e);
-    Point Cpk_e = G.mul(csk_e);
+    KeyPair ck_e = keygen(ECGroup);
+    BigInt csk_e = ck_e.first;
+    Point Cpk_e = ck_e.second;
 
     // Second communication with the server
     std::cout << "Get signed server keychain" << std::endl;
