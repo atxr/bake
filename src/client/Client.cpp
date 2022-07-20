@@ -80,7 +80,7 @@ bool Client::verify(Query Q)
     Point B = blind(X, r);
 
     // Generate a new exchange key pair
-    KeyPair ck_e = keygen(ECGroup);
+    KeyPair ck_e = keygen(G, ECGroup);
     BigInt csk_e = ck_e.first;
     Point Cpk_e = ck_e.second;
 

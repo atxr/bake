@@ -6,7 +6,7 @@ ComputationServer::ComputationServer(AuthenticationServer as) : as(as)
     ECGroup->get_rand_point(G);
 
     // Generate server key pair
-    KeyPair sk = keygen(ECGroup);
+    KeyPair sk = keygen(G, ECGroup);
     ssk = sk.first;
     Spk = sk.second;
 }
@@ -24,7 +24,7 @@ ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e
     Point Cpk_r = clients[id]->second;
 
     // Generate an exchange key pair
-    KeyPair sk_e = keygen(ECGroup);
+    KeyPair sk_e = keygen(G, ECGroup);
     BigInt ssk_e = sk_e.first;
     Point Spk_e = sk_e.second;
 

@@ -36,11 +36,11 @@ BigInt KDF(Point K1, Point K2, Point K3, Point K4, Point K5, Point K6, Point K7)
     return P.toHash();
 }
 
-KeyPair keygen(Group* ECGroup) {
+KeyPair keygen(Point P, Group* ECGroup) {
     KeyPair kp;
     BigInt sk;
     ECGroup->get_rand_bn(sk);
-    Point pk = ECGroup->get_generator().mul(sk);
+    Point pk = P.mul(sk);
     kp.first = sk;
     kp.second = pk;
 
