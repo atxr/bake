@@ -20,15 +20,21 @@ set (sources
 	src/client/Client.cpp
 	src/server/ComputationServer.cpp
 	src/server/AuthenticationServer.cpp
+	src/thimbleExt/FJFXFingerprint.cpp
 )
 
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 link_libraries(OpenSSL::SSL)
+
+find_library(Thimble NAMES libthimble.a)
+find_library(FJFX NAMES libFJFX.a libFRFXLL.a)
+
 include_directories(./src)
 
 foreach(sourcefile ${app})
 	string( REPLACE ".cpp" "" appname ${sourcefile} )
 	string( REPLACE "test/" "" appname ${appname} )
 	add_executable(${appname} ${sourcefile} ${sources})
+	target_link_libraries(${appname} FJFX FRFXLL thimble)
 endforeach(sourcefile ${app})
