@@ -1,7 +1,6 @@
 #pragma once
 #include "AuthenticationServer.hpp"
 #include <unordered_map>
-#include <utility>
 
 using StoredClient = std::pair<FuzzyVault, Point>;
 

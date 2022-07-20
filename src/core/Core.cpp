@@ -6,11 +6,7 @@
 #include <openssl/bn.h>
 #include <openssl/obj_mac.h>
 #include <openssl/sha.h>
-#include "ec.hpp"
-
-class FuzzyVault
-{
-};
+#include "Core.hpp"
 
 Point blind(const Point P, const BigInt r)
 {
@@ -38,6 +34,17 @@ BigInt KDF(Point K1, Point K2, Point K3, Point K4, Point K5, Point K6, Point K7)
         P = P.add(k[i]);
     }
     return P.toHash();
+}
+
+KeyPair keygen(Group* ECGroup) {
+    KeyPair kp;
+    BigInt sk;
+    ECGroup->get_rand_bn(sk);
+    Point pk = ECGroup->get_generator().mul(sk);
+    kp.first = sk;
+    kp.second = pk;
+
+    return kp;
 }
 
 #endif
