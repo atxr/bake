@@ -14,13 +14,30 @@ bool Client::init()
     return true;
 }
 
-bool Client::enroll(BytesVault vault)
+bool Client::enroll(MinutiaeView ref)
 {
     id = ++count;
 
-    // BigInt x = vault.getf0();
+    // Real version
+    // Lock the vault
+    ProtectedMinutiaeTemplate vault(mcytWidth, mcytHeight, mcytDpi);
+    if (!vault.enroll(ref))
+    {
+        cout << "Failed to lock the vault with the reference " << ref << endl;
+        exit(1);
+    }
+    BytesVault bVault = fuzzyVault2Bytes(vault);
+
+    // Open the vault and get f0
+    SmallBinaryFieldPolynomial f(vault.getField());
+    vault.open(f, ref);
+    BigInt x;
+    x.fromInt(f.eval(0));
+
+    // Debug version
     // use the temporary stored x
-    BigInt x = tempf0;
+    // BigInt x = tempf0;
+
     std::cout << "x enroll: 0x";
     BN_print_fp(stdout, x.n);
     std::cout << std::endl;
@@ -32,7 +49,7 @@ bool Client::enroll(BytesVault vault)
 
     // First communication with the computation server
     std::cout << "Signing" << std::endl;
-    Point S = cs.signToEnroll(vault, B, id);
+    Point S = cs.signToEnroll(bVault, B, id);
     if (S.is_empty())
     {
         std::cout << "Failed: S is empty" << std::endl;
@@ -46,7 +63,7 @@ bool Client::enroll(BytesVault vault)
 
     // Second communication with the computation server
     std::cout << "Storing" << std::endl;
-    bool st = cs.store(vault, id, Cpk_r);
+    bool st = cs.store(bVault, id, Cpk_r);
     if (!st)
     {
         std::cout << "Failed: Storing" << std::endl;

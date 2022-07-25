@@ -6,8 +6,8 @@ class Client
 public:
     Client(ComputationServer cs);
     bool init();
-    bool enroll(BytesVault vault);
-    bool verify(MinutiaeView MinutiaeView);
+    bool enroll(MinutiaeView ref);
+    bool verify(MinutiaeView query);
 
 
 private:

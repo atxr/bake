@@ -27,19 +27,7 @@ int main(int argc, char** argv)
     // Enrollment
 
     cout << "Enrollment" << endl;
-    ProtectedMinutiaeTemplate vault(mcytWidth, mcytHeight, mcytDpi);
-    MinutiaeView ref = getMinutiaeView(argv[1]);
-    if (vault.enroll(ref))
-    {
-        cout << "Vault locked" << endl;
-    }
-    else
-    {
-        cout << "Failed to lock the vault with the reference " << argv[1] << endl;
-        exit(1);
-    }
-
-    if (!c.enroll(fuzzyVault2Bytes(vault)))
+    if (!c.enroll(getMinutiaeView(argv[1])))
     {
         cout << "Enrollment failed" << endl;
         exit(1);

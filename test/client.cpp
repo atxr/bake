@@ -22,7 +22,7 @@ int main()
     cout << "Init successful" << endl << endl;
 
     cout << "Enrollment" << endl;
-    if (!c.enroll(BytesVault()))
+    if (!c.enroll(MinutiaeView()))
     {
         cout << "Enrollment failed" << endl;
         exit(1);
