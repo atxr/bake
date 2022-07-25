@@ -18,7 +18,7 @@ MinutiaeView getMinutiaeView(string path)
 
 BytesVault fuzzyVault2Bytes(ProtectedMinutiaeTemplate vault)
 {
-    BytesVault data;
+    uint8_t* data;
     int size, wsize;
 
     // Initialize byte array ...
@@ -33,13 +33,13 @@ BytesVault fuzzyVault2Bytes(ProtectedMinutiaeTemplate vault)
 
     // ... in which this protected minutiae template is packed.
     vault.toBytes(data);
-    return data;
+    return BytesVault(data, vault.getSizeInBytes());
 }
 
-ProtectedMinutiaeTemplate bytes2FuzzyVault(BytesVault data)
+ProtectedMinutiaeTemplate bytes2FuzzyVault(BytesVault bVault)
 {
     ProtectedMinutiaeTemplate vault;
-    vault.fromBytes(data, sizeof(data));
+    vault.fromBytes(bVault.data, bVault.size);
     return vault;
 }
 
