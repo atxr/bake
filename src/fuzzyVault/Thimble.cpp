@@ -42,3 +42,16 @@ ProtectedMinutiaeTemplate bytes2FuzzyVault(BytesVault data)
     vault.fromBytes(data, sizeof(data));
     return vault;
 }
+
+uint32_t getf0(BytesVault bVault, MinutiaeView view)
+{
+    ProtectedMinutiaeTemplate vault = bytes2FuzzyVault(bVault);
+    SmallBinaryFieldPolynomial f(vault.getField());
+    if (!vault.open(f, view))
+    {
+        cout << "Cannot recover f(0) with this vault" << endl;
+        exit(1);
+    }
+
+    return f.eval(0);
+}
