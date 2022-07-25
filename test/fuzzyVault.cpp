@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 
     BytesVault bVault = fuzzyVault2Bytes(vault);
 
-    // ... ///
+    // ... //
 
     ProtectedMinutiaeTemplate recVault = bytes2FuzzyVault(bVault);
     MinutiaeView query = getMinutiaeView(argv[2]);
@@ -38,6 +38,7 @@ int main(int argc, char **argv)
     if (vault.open(f, query))
     {
         cout << "Vault unlocked" << endl;
+        cout << "f(0) = " << f.eval(0) << endl;
     }
     else
     {
