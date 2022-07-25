@@ -14,6 +14,7 @@ set (app
 	test/blinding.cpp
 	test/hash.cpp
 	test/fuzzyVault.cpp
+	test/bake.cpp
 )
 set (sources
 	src/core/Core.cpp
