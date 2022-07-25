@@ -6,10 +6,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    // Values for the mcyt database
-    int width(256);
-    int height(400);
-    int dpi(500);
+
 
     if (argc != 3)
     {
@@ -17,7 +14,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    ProtectedMinutiaeTemplate vault(width, height, dpi);
+    ProtectedMinutiaeTemplate vault(mcytWidth, mcytHeight, mcytDpi);
     MinutiaeView ref = getMinutiaeView(argv[1]);
     if (vault.enroll(ref))
     {
@@ -26,13 +23,9 @@ int main(int argc, char **argv)
     else
     {
         cout << "Failed to lock the vault with the reference " << argv[1] << endl;
+        exit(1);
     }
 
-    BytesVault bVault = fuzzyVault2Bytes(vault);
-
-    // ... //
-
-    ProtectedMinutiaeTemplate recVault = bytes2FuzzyVault(bVault);
     MinutiaeView query = getMinutiaeView(argv[2]);
     SmallBinaryFieldPolynomial f(vault.getField());
     if (vault.open(f, query))
