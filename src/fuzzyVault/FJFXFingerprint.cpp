@@ -30,7 +30,7 @@
  * @author Alexandre Tullot
  */
 
-#include "FJFXFingerprint.h"
+#include "FJFXFingerprint.hpp"
 
 /**
  * @brief

@@ -13,7 +13,7 @@ set (app
 	test/client.cpp
 	test/blinding.cpp
 	test/hash.cpp
-	test/fuzzyvault.cpp
+	test/fuzzyVault.cpp
 )
 set (sources
 	src/core/Core.cpp
@@ -21,7 +21,8 @@ set (sources
 	src/client/Client.cpp
 	src/server/ComputationServer.cpp
 	src/server/AuthenticationServer.cpp
-	src/thimbleExt/FJFXFingerprint.cpp
+	src/fuzzyVault/FJFXFingerprint.cpp
+	src/fuzzyVault/Thimble.cpp
 )
 
 find_package(OpenSSL REQUIRED)
