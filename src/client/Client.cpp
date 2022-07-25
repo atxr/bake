@@ -54,7 +54,7 @@ bool Client::enroll(BytesVault vault)
     return st;
 }
 
-bool Client::verify(Query Q)
+bool Client::verify(MinutiaeView Q)
 {
     // First communication with the server
     std::cout << "Get vault stored on the computation server" << std::endl;

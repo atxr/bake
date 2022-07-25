@@ -30,7 +30,7 @@ int main()
     cout << "Enrollment successful!" << endl << endl;
     
     cout << "Verification" << endl;
-    if (!c.verify(Query()))
+    if (!c.verify(MinutiaeView()))
     {
         cout << "Verify: Query failed" << endl;
         exit(1);

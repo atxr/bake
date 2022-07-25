@@ -16,7 +16,3 @@ BigInt KDF(Point K1, Point K2, Point K3, Point K4, Point K5, Point K6, Point K7)
 KeyPair keygen(Point P, Group *ECGroup);
 Point getPublicKey(BigInt sk, Point P);
 Point signPoint(Point P, BigInt k);
-
-class Query
-{
-};

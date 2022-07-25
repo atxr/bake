@@ -7,7 +7,7 @@ public:
     Client(ComputationServer cs);
     bool init();
     bool enroll(BytesVault vault);
-    bool verify(Query query);
+    bool verify(MinutiaeView MinutiaeView);
 
 
 private:
