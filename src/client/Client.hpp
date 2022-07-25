@@ -9,9 +9,11 @@ public:
     bool enroll(FuzzyVault vault);
     bool verify(Query query);
 
+
 private:
     ComputationServer cs;
     int id;
+    static unsigned int count;
     Group *ECGroup;
     Point G;
     

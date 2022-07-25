@@ -2,6 +2,7 @@
 #include <iostream>
 
 Client::Client(ComputationServer cs) : cs(cs) {}
+unsigned int Client::count = 0; 
 
 bool Client::init()
 {
@@ -15,8 +16,7 @@ bool Client::init()
 
 bool Client::enroll(FuzzyVault vault)
 {
-    // TODO id++
-    id = 0;
+    id = ++count;
 
     // BigInt x = vault.getf0();
     // use the temporary stored x
