@@ -14,7 +14,7 @@ bool Client::init()
     return true;
 }
 
-bool Client::enroll(FuzzyVault vault)
+bool Client::enroll(BytesVault vault)
 {
     id = ++count;
 
@@ -59,7 +59,7 @@ bool Client::verify(Query Q)
     // First communication with the server
     std::cout << "Get vault stored on the computation server" << std::endl;
     // TODO catch error
-    FuzzyVault vault = cs.getVault(id);
+    BytesVault vault = cs.getVault(id);
 
     // BigInt x = vault.getf0(Q);
     // use the temporary stored x

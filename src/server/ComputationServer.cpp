@@ -13,7 +13,7 @@ ComputationServer::ComputationServer(AuthenticationServer as) : as(as)
 
 Group *ComputationServer::getGroup() { return as.getGroup(); }
 Point ComputationServer::getPublicGenerator() { return G; }
-FuzzyVault ComputationServer::getVault(unsigned int id) { return clients[id]->first; } // TODO tmp
+BytesVault ComputationServer::getVault(unsigned int id) { return clients[id]->first; }
 
 ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e)
 {
@@ -39,13 +39,13 @@ ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e
     return keychain;
 }
 
-Point ComputationServer::signToEnroll(FuzzyVault vault, Point B, unsigned int id)
+Point ComputationServer::signToEnroll(BytesVault vault, Point B, unsigned int id)
 {
     // TODO store temp vault and id
     return as.sign(B);
 }
 
-bool ComputationServer::store(FuzzyVault vault, unsigned int id, Point Cpk_r)
+bool ComputationServer::store(BytesVault vault, unsigned int id, Point Cpk_r)
 {
     clients[id] = new StoredClient(vault, Cpk_r);
     return true;

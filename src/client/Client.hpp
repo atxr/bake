@@ -6,7 +6,7 @@ class Client
 public:
     Client(ComputationServer cs);
     bool init();
-    bool enroll(FuzzyVault vault);
+    bool enroll(BytesVault vault);
     bool verify(Query query);
 
 

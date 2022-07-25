@@ -22,7 +22,7 @@ int main()
     cout << "Init successful" << endl << endl;
 
     cout << "Enrollment" << endl;
-    if (!c.enroll(FuzzyVault()))
+    if (!c.enroll(BytesVault()))
     {
         cout << "Enrollment failed" << endl;
         exit(1);

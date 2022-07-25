@@ -2,7 +2,7 @@
 #include "AuthenticationServer.hpp"
 #include <unordered_map>
 
-using StoredClient = std::pair<FuzzyVault, Point>;
+using StoredClient = std::pair<BytesVault, Point>;
 
 struct ServerKeychain {
     Point Spk, Spk_e, S;
@@ -16,10 +16,10 @@ public:
     ComputationServer(AuthenticationServer as);
     Group* getGroup();
     Point getPublicGenerator();
-    FuzzyVault getVault(unsigned int id);
-    Point signToEnroll(FuzzyVault vault, Point B, unsigned int id);
+    BytesVault getVault(unsigned int id);
+    Point signToEnroll(BytesVault vault, Point B, unsigned int id);
     ServerKeychain signToVerify(unsigned int id, Point B, Point Cpk_e);
-    bool store(FuzzyVault vault, unsigned int id, Point Cpk_r);
+    bool store(BytesVault vault, unsigned int id, Point Cpk_r);
 
 private:
     ServerKeychain getServerKeychain(unsigned int id, Point Cpk_e);

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <openssl/ec.h>
 #include "core/Core.hpp"
-#include "fuzzyVault/Thimble.hpp"
 
 using namespace std;
 
@@ -29,11 +28,11 @@ int main(int argc, char **argv)
         cout << "Failed to lock the vault with the reference " << argv[1] << endl;
     }
 
-    uint8_t *vaultBytes = fuzzyVault2Bytes(vault);
+    BytesVault bVault = fuzzyVault2Bytes(vault);
 
     // ... ///
 
-    ProtectedMinutiaeTemplate recVault = bytes2FuzzyVault(vaultBytes);
+    ProtectedMinutiaeTemplate recVault = bytes2FuzzyVault(bVault);
     MinutiaeView query = getMinutiaeView(argv[2]);
     SmallBinaryFieldPolynomial f(vault.getField());
     if (vault.open(f, query))

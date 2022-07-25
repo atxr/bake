@@ -1,6 +1,8 @@
 #pragma once
 #include "FJFXFingerprint.hpp"
 
+using BytesVault = uint8_t*;
+
 MinutiaeView getMinutiaeView(string image);
-uint8_t *fuzzyVault2Bytes(ProtectedMinutiaeTemplate vault);
-ProtectedMinutiaeTemplate bytes2FuzzyVault(uint8_t *data);
+BytesVault fuzzyVault2Bytes(ProtectedMinutiaeTemplate vault);
+ProtectedMinutiaeTemplate bytes2FuzzyVault(BytesVault data);

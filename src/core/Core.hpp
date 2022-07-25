@@ -5,6 +5,7 @@
 #include <openssl/obj_mac.h>
 #include <utility>
 #include "ec.hpp"
+#include "fuzzyVault/Thimble.hpp"
 
 using KeyPair = std::pair<BigInt, Point>;
 using BlindedPair = std::pair<Point, BigInt>;
@@ -16,9 +17,6 @@ KeyPair keygen(Point P, Group *ECGroup);
 Point getPublicKey(BigInt sk, Point P);
 Point signPoint(Point P, BigInt k);
 
-class FuzzyVault
-{
-};
 class Query
 {
 };
