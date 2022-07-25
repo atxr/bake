@@ -80,7 +80,7 @@ void BigInt::from_bin(const unsigned char *in, int length)
 
 void BigInt::fromInt(uint32_t x) 
 {
-    BN_free(n);
+    // FIXME memory leak
     std::string dec = std::to_string(x);
     BN_dec2bn(&n, dec.c_str());
 }
