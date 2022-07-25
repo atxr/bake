@@ -54,18 +54,22 @@ bool Client::enroll(BytesVault vault)
     return st;
 }
 
-bool Client::verify(MinutiaeView Q)
+bool Client::verify(MinutiaeView query)
 {
     // First communication with the server
     std::cout << "Get vault stored on the computation server" << std::endl;
-    // TODO catch error
     BytesVault vault = cs.getVault(id);
 
-    // BigInt x = vault.getf0(Q);
+    // Real version
+    BigInt x;
+    x.fromInt(getf0(vault, query));
+
+    // Debug version
     // use the temporary stored x
-    BigInt x = tempf0;
+    // x = tempf0
     // or use a random x (must fail)
     // ECGroup->get_rand_bn(x);
+
     std::cout << "x verify: 0x";
     BN_print_fp(stdout, x.n);
     std::cout << std::endl;
