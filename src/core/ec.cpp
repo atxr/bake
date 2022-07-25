@@ -78,6 +78,13 @@ void BigInt::from_bin(const unsigned char *in, int length)
     n = BN_bin2bn(in, length, nullptr);
 }
 
+void BigInt::fromInt(uint32_t x) 
+{
+    BN_free(n);
+    std::string dec = std::to_string(x);
+    BN_dec2bn(&n, dec.c_str());
+}
+
 BigInt BigInt::add(const BigInt &oth)
 {
     BigInt ret;

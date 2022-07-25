@@ -33,6 +33,7 @@ public:
     void to_bin(unsigned char *in);
     BigInt toHash();
     void from_bin(const unsigned char *in, int length);
+    void fromInt(uint32_t x);
 
     BigInt add(const BigInt &oth);
     BigInt mul(const BigInt &oth, BN_CTX *ctx);
