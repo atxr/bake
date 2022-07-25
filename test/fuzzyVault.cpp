@@ -24,18 +24,25 @@ int main(int argc, char **argv)
     {
         cout << "Vault locked" << endl;
     }
+    else
+    {
+        cout << "Failed to lock the vault with the reference " << argv[1] << endl;
+    }
 
-    uint8_t* vaultBytes = fuzzyVault2bytes(vault);
+    uint8_t *vaultBytes = fuzzyVault2Bytes(vault);
 
     // ... ///
 
-    ProtectedMinutiaeTemplate recVault;
-    recVault.fromBytes(vaultBytes, sizeof(vaultBytes));
+    ProtectedMinutiaeTemplate recVault = bytes2FuzzyVault(vaultBytes);
     MinutiaeView query = getMinutiaeView(argv[2]);
     SmallBinaryFieldPolynomial f(vault.getField());
     if (vault.open(f, query))
     {
         cout << "Vault unlocked" << endl;
+    }
+    else
+    {
+        cout << "Failed to unlock the vault with the query " << argv[2] << endl;
     }
 
     return 0;
