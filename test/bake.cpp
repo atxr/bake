@@ -6,6 +6,13 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+    if (argc != 3) 
+    {
+        cout << "Error. Not enough arguments" << endl;
+        cout << "Usage: bake <path to reference image> <path to query image>" << endl;
+        exit(1); 
+    }
+
     // Initialisation
 
     cout << "Init" << endl;
