@@ -236,10 +236,10 @@ void Point::fromHash(Group *ECGroup, BigInt x)
     BigInt m;
     BN_CTX *ctx = group->bn_ctx;
 
-    // TODO nicer assertion with logs
     if (EC_GROUP_get_curve(ECGroup->ec_group, m.n, a.n, b.n, nullptr) == 0)
     {
         std::cout << "Error at get curve" << std::endl;
+        exit(1);
     }
 
     BigInt incr;
@@ -265,12 +265,7 @@ void Point::fromHash(Group *ECGroup, BigInt x)
             std::cout << "Error: HashToCurve didn't generate a point on the curve" << std::endl;
             exit(1);
         }
-        std::cout << "SQRT succedded!" << std::endl;
         return;
-    }
-    else
-    {
-        std::cout << "SQRT failed, adding 1 to hash" << std::endl;
     }
     x = x.add(incr);
     fromHash(ECGroup, x);
