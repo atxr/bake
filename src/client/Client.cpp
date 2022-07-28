@@ -2,7 +2,7 @@
 #include <iostream>
 
 Client::Client(ComputationServer cs) : cs(cs) {}
-unsigned int Client::count = 0; 
+unsigned int Client::count = 0;
 
 bool Client::init()
 {
@@ -14,7 +14,7 @@ bool Client::init()
     return true;
 }
 
-bool Client::enroll(MinutiaeView ref)
+bool Client::enroll(MinutiaeView ref, bool verbose)
 {
     id = ++count;
 
@@ -38,9 +38,12 @@ bool Client::enroll(MinutiaeView ref)
     // use the temporary stored x
     // BigInt x = tempf0;
 
-    std::cout << "x enroll: 0x";
-    BN_print_fp(stdout, x.n);
-    std::cout << std::endl;
+    if (verbose)
+    {
+        std::cout << "x enroll: 0x";
+        BN_print_fp(stdout, x.n);
+        std::cout << std::endl;
+    }
 
     // Generate the blinded point
     BlindedPair bp = blind(x, ECGroup);
@@ -48,7 +51,10 @@ bool Client::enroll(MinutiaeView ref)
     BigInt r = bp.second;
 
     // First communication with the computation server
-    std::cout << "Signing" << std::endl;
+    if (verbose)
+    {
+        std::cout << "Signing" << std::endl;
+    }
     Point S = cs.signToEnroll(bVault, B, id);
     if (S.is_empty())
     {
@@ -62,7 +68,10 @@ bool Client::enroll(MinutiaeView ref)
     Point Cpk_r = G.mul(csk_r);
 
     // Second communication with the computation server
-    std::cout << "Storing" << std::endl;
+    if (verbose)
+    {
+        std::cout << "Storing" << std::endl;
+    }
     bool st = cs.store(bVault, id, Cpk_r);
     if (!st)
     {
@@ -71,15 +80,23 @@ bool Client::enroll(MinutiaeView ref)
     return st;
 }
 
-bool Client::verify(MinutiaeView query)
+bool Client::verify(MinutiaeView query, bool verbose)
 {
     // First communication with the server
-    std::cout << "Get vault stored on the computation server" << std::endl;
+    if (verbose)
+    {
+        std::cout << "Get vault stored on the computation server" << std::endl;
+    }
     BytesVault vault = cs.getVault(id);
 
     // Real version
+    uint32_t f0 = getf0(vault, query);
+    if (f0 == -1)
+    {
+        return false;
+    }
     BigInt x;
-    x.fromInt(getf0(vault, query));
+    x.fromInt(f0);
 
     // Debug version
     // use the temporary stored x
@@ -87,9 +104,12 @@ bool Client::verify(MinutiaeView query)
     // or use a random x (must fail)
     // ECGroup->get_rand_bn(x);
 
-    std::cout << "x verify: 0x";
-    BN_print_fp(stdout, x.n);
-    std::cout << std::endl;
+    if (verbose)
+    {
+        std::cout << "x verify: 0x";
+        BN_print_fp(stdout, x.n);
+        std::cout << std::endl;
+    }
 
     // Generate the blinded point
     Point B;
@@ -102,7 +122,10 @@ bool Client::verify(MinutiaeView query)
     std::tie(csk_e, Cpk_e) = keygen(G, ECGroup);
 
     // Second communication with the server
-    std::cout << "Get signed server keychain" << std::endl;
+    if (verbose)
+    {
+        std::cout << "Get signed server keychain" << std::endl;
+    }
     ServerKeychain sKeychain = cs.signToVerify(id, B, Cpk_e);
     if (sKeychain.st == false)
     {
@@ -124,11 +147,14 @@ bool Client::verify(MinutiaeView query)
     BigInt h_kc = kc.toHash();
 
     // compare the final keys
-    std::cout << "H(kc) : 0x";
-    BN_print_fp(stdout, h_kc.n);
-    std::cout << std::endl;
-    std::cout << "H(ks) : 0x";
-    BN_print_fp(stdout, sKeychain.h_ks.n);
-    std::cout << std::endl;
+    if (verbose)
+    {
+        std::cout << "H(kc) : 0x";
+        BN_print_fp(stdout, h_kc.n);
+        std::cout << std::endl;
+        std::cout << "H(ks) : 0x";
+        BN_print_fp(stdout, sKeychain.h_ks.n);
+        std::cout << std::endl;
+    }
     return h_kc == sKeychain.h_ks;
 }
