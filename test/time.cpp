@@ -1,19 +1,65 @@
+/**
+ * @file time.cpp
+ * @author Alexandre TULLOT (Alexandre.TULLOT@student.isae-supaero.fr)
+ * @brief Test the time performances of the protocol
+ * @date 2022-07-28
+ *
+ * @copyright Copyright (c) 2022
+ *
+ * This test was designed with the mcyt fingerprint dataset.
+ */
+
 #include <iostream>
-#include <openssl/ec.h>
 #include "client/Client.hpp"
 #include <chrono>
+#include <dirent.h>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
-
-int main(int argc, char **argv)
+struct Result
 {
-    if (argc != 3)
+    int init, enroll, verify, full, st;
+    Result()
     {
-        cout << "Error. Not enough arguments" << endl;
-        cout << "Usage: bake <path to reference image> <path to query image>" << endl;
-        exit(1);
+        init = enroll = verify = full = st = -1;
     }
 
+    Result(int i)
+    {
+        init = i;
+        enroll = verify = full = st = -1;
+    }
+
+    Result(int i, int e, int v, int f, int s)
+    {
+        init = i;
+        enroll = e;
+        verify = v;
+        full = f;
+        st = s;
+    }
+};
+
+int median(vector<int> &v)
+{
+    if (v.empty())
+    {
+        return 0;
+    }
+    auto n = v.size() / 2;
+    nth_element(v.begin(), v.begin() + n, v.end());
+    auto med = v[n];
+    if (!(v.size() & 1))
+    { // If the set size is even
+        auto max_it = max_element(v.begin(), v.begin() + n);
+        med = (*max_it + med) / 2.0;
+    }
+    return med;
+}
+
+Result testOne(string ref, string query)
+{
     // Initialisation
     auto startFull = chrono::high_resolution_clock::now();
 
@@ -27,39 +73,116 @@ int main(int argc, char **argv)
     Client c(cs);
     if (!c.init())
     {
-        cout << "Error during init" << endl;
-        exit(1);
+        return Result();
     }
 
     auto stop = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
-    cout << "Init timer: " << duration.count() << "ms" << endl;
+    int init = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
 
     // Enrollment
 
     start = chrono::high_resolution_clock::now();
-    if (!c.enroll(getMinutiaeView(argv[1]), false))
+    if (!c.enroll(getMinutiaeView(ref), false))
     {
-        cout << "Enrollment failed" << endl;
-        exit(1);
+        return Result(init);
     }
 
     stop = chrono::high_resolution_clock::now();
-    duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
-    cout << "Enrollment timer: " << duration.count() << "ms" << endl;
+    int enroll = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
 
     // Verification
 
     start = chrono::high_resolution_clock::now();
-    if (!c.verify(getMinutiaeView(argv[2]), false))
-    {
-        cout << "Verify: Query failed" << endl;
-    }
+    int st = c.verify(getMinutiaeView(query), false) ? 1 : 0;
 
     stop = chrono::high_resolution_clock::now();
-    duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
-    auto durationFull = chrono::duration_cast<chrono::milliseconds>(stop - startFull);
-    cout << "Verification timer: " << duration.count() << "ms" << endl;
-    cout << "Full timer: " << durationFull.count() << "ms" << endl;
+    int verify = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
+    int full = chrono::duration_cast<chrono::milliseconds>(stop - startFull).count();
+    return Result(init, enroll, verify, full, st);
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        cout << "Error. Not enough arguments" << endl;
+        cout << "Usage: bake <path to mcyt dp pgm images> <number of images for the test>" << endl;
+        exit(1);
+    }
+
+    string path = argv[1];
+    int n = stoi(argv[2]);
+    int aMax(434);
+    int bMax(9);
+    int cMax(11);
+
+    vector<int> mated[4];
+    vector<int> nonmated[4];
+    Result res;
+
+    DIR *dir;
+    struct dirent *ent;
+    int count = 0;
+    if ((dir = opendir(path.c_str())) != NULL)
+    {
+        while ((ent = readdir(dir)) != NULL && count < n)
+        {
+            string imageName(ent->d_name);
+            if (imageName.find(".pgm", 0) != string::npos)
+            {
+                string b = imageName.substr(8, 1);
+                string c = imageName.substr(10, 2);
+                bool pad = 1;
+
+                if (c.find(".") != string::npos)
+                {
+                    pad = 0;
+                    c = c.substr(0, 1);
+                }
+
+                string query = imageName.substr(0, 10) +
+                               to_string(1 + stoi(c) % cMax) +
+                               imageName.substr(11 + pad);
+
+                cout << path << imageName << " VS " << path << query << endl;
+                res = testOne(path + imageName, path + query);
+
+                mated[0].push_back(res.init);
+                mated[1].push_back(res.enroll);
+                mated[2].push_back(res.verify);
+                mated[3].push_back(res.full);
+
+                query = imageName.substr(0, 8) +
+                        to_string(1 + stoi(b) % bMax) +
+                        imageName.substr(9);
+
+                cout << path << imageName << " VS " << path << query << endl;
+                res = testOne(path + imageName, path + query);
+
+                nonmated[0].push_back(res.init);
+                nonmated[1].push_back(res.enroll);
+                nonmated[2].push_back(res.verify);
+                nonmated[3].push_back(res.full);
+
+                count++;
+            }
+        }
+        closedir(dir);
+    }
+    else
+    {
+        /* could not open directory */
+        perror("");
+        exit(EXIT_FAILURE);
+    }
+
+    cout << endl;
+    cout << "Test finished, with " << n * 2 << " different key exchanges." << endl;
+    cout << "Results: mated / nonmated" << endl;
+    cout << "Init: " << median(mated[0]) << "ms / " << median(nonmated[0]) << "ms" << endl;
+    cout << "Enroll: " << median(mated[1]) << "ms / " << median(nonmated[1]) << "ms" << endl;
+    cout << "Verify: " << median(mated[2]) << "ms / " << median(nonmated[2]) << "ms" << endl;
+    cout << "Full: " << median(mated[3]) << "ms / " << median(nonmated[3]) << "ms" << endl;
+
     return 0;
 }
