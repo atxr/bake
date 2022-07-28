@@ -50,7 +50,7 @@ uint32_t getf0(BytesVault bVault, MinutiaeView view)
     if (!vault.open(f, view))
     {
         cout << "Cannot recover f(0) with this vault" << endl;
-        exit(1);
+        return -1;
     }
 
     return f.eval(0);
