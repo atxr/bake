@@ -49,7 +49,6 @@ uint32_t getf0(BytesVault bVault, MinutiaeView view)
     SmallBinaryFieldPolynomial f(vault.getField());
     if (!vault.open(f, view))
     {
-        cout << "Cannot recover f(0) with this vault" << endl;
         return -1;
     }
 

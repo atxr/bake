@@ -93,6 +93,10 @@ bool Client::verify(MinutiaeView query, bool verbose)
     uint32_t f0 = getf0(vault, query);
     if (f0 == -1)
     {
+        if (verbose)
+        {
+            cout << "Cannot recover f(0) with this vault" << endl;
+        }
         return false;
     }
     BigInt x;
