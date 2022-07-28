@@ -116,16 +116,16 @@ int main(int argc, char **argv)
     int bMax(9);
     int cMax(11);
 
-    vector<int> mated[4];
-    vector<int> nonmated[4];
+    vector<int> mated[5];
+    vector<int> nonmated[5];
     Result res;
 
     DIR *dir;
     struct dirent *ent;
-    int count = 0;
+    int counter = 0;
     if ((dir = opendir(path.c_str())) != NULL)
     {
-        while ((ent = readdir(dir)) != NULL && count < n)
+        while ((ent = readdir(dir)) != NULL && counter < n)
         {
             string imageName(ent->d_name);
             if (imageName.find(".pgm", 0) != string::npos)
@@ -144,27 +144,29 @@ int main(int argc, char **argv)
                                to_string(1 + stoi(c) % cMax) +
                                imageName.substr(11 + pad);
 
-                cout << path << imageName << " VS " << path << query << endl;
+                cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
                 res = testOne(path + imageName, path + query);
 
                 mated[0].push_back(res.init);
                 mated[1].push_back(res.enroll);
                 mated[2].push_back(res.verify);
                 mated[3].push_back(res.full);
+                mated[4].push_back(res.st);
 
                 query = imageName.substr(0, 8) +
                         to_string(1 + stoi(b) % bMax) +
                         imageName.substr(9);
 
-                cout << path << imageName << " VS " << path << query << endl;
+                cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
                 res = testOne(path + imageName, path + query);
 
                 nonmated[0].push_back(res.init);
                 nonmated[1].push_back(res.enroll);
                 nonmated[2].push_back(res.verify);
                 nonmated[3].push_back(res.full);
+                nonmated[4].push_back(res.st);
 
-                count++;
+                counter++;
             }
         }
         closedir(dir);
@@ -178,11 +180,23 @@ int main(int argc, char **argv)
 
     cout << endl;
     cout << "Test finished, with " << n * 2 << " different key exchanges." << endl;
-    cout << "Results: mated / nonmated" << endl;
-    cout << "Init: " << median(mated[0]) << "ms / " << median(nonmated[0]) << "ms" << endl;
-    cout << "Enroll: " << median(mated[1]) << "ms / " << median(nonmated[1]) << "ms" << endl;
-    cout << "Verify: " << median(mated[2]) << "ms / " << median(nonmated[2]) << "ms" << endl;
-    cout << "Full: " << median(mated[3]) << "ms / " << median(nonmated[3]) << "ms" << endl;
+    cout << "Results: mated | nonmated" << endl;
+    cout << "Success: "
+         << count(mated[4].begin(), mated[4].end(), 1) * 100 / mated[4].size() << "% | "
+         << count(nonmated[4].begin(), nonmated[4].end(), 1) * 100 / nonmated[4].size() << "%" << endl;
+    cout << "Failure: "
+         << count(mated[4].begin(), mated[4].end(), 0) * 100 / mated[4].size() << "% | "
+         << count(nonmated[4].begin(), nonmated[4].end(), 0) * 100 / nonmated[4].size() << "%" << endl;
+    cout << "Errors: " 
+         << count(mated[4].begin(), mated[4].end(), -1) * 100 / mated[4].size() << "% | "
+         << count(nonmated[4].begin(), nonmated[4].end(), -1) * 100 / nonmated[4].size() << "%" << endl;
+
+    cout << endl;
+    cout << "Times: mated | nonmated" << endl;
+    cout << "Init: " << median(mated[0]) << "ms | " << median(nonmated[0]) << "ms" << endl;
+    cout << "Enroll: " << median(mated[1]) << "ms | " << median(nonmated[1]) << "ms" << endl;
+    cout << "Verify: " << median(mated[2]) << "ms | " << median(nonmated[2]) << "ms" << endl;
+    cout << "Full: " << median(mated[3]) << "ms | " << median(nonmated[3]) << "ms" << endl;
 
     return 0;
 }
