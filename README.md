@@ -48,3 +48,11 @@ The building has been tested on Archlinux x64 only, feel free to open an issue i
 ### Documentation
 
 TODO
+
+FIXME permutation error
+```bash
+mv /mnt/dasec/dataset/mcyt/mcyt330dp/pgm/dp_0001_2_5.pgm /mnt/dasec/dataset/mcyt/mcyt330dp/pgm/dp_0001_2_5.err
+cp /mnt/dasec/dataset/mcyt/mcyt330dp/pgm/dp_0001_2_4.pgm /mnt/dasec/dataset/mcyt/mcyt330dp/pgm/dp_0001_2_5.pgm
+mv /mnt/dasec/dataset/mcyt/mcyt330dp/pgm/dp_0004_8_1.pgm /mnt/dasec/dataset/mcyt/mcyt330dp/pgm/dp_0004_8_1.err
+cp /mnt/dasec/dataset/mcyt/mcyt330dp/pgm/dp_0004_8_0.pgm /mnt/dasec/dataset/mcyt/mcyt330dp/pgm/dp_0004_8_1.pgm
+```
