@@ -20,19 +20,17 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
 
     // Real version
     // Lock the vault
-    ProtectedMinutiaeTemplate vault(mcytWidth, mcytHeight, mcytDpi);
+    FuzzyVaultBake vault(mcytWidth, mcytHeight, mcytDpi);
     if (!vault.enroll(ref))
     {
         cout << "Failed to lock the vault with the reference " << ref << endl;
         exit(1);
     }
-    BytesVault bVault = fuzzyVault2Bytes(vault);
+    BytesVault bVault = vault.toBytesVault();
 
     // Open the vault and get f0
-    SmallBinaryFieldPolynomial f(vault.getField());
-    vault.open(f, ref);
     BigInt x;
-    x.fromInt(f.eval(0));
+    x.fromInt(vault.getf0(ref));
 
     // Debug version
     // use the temporary stored x
@@ -87,10 +85,11 @@ bool Client::verify(MinutiaeView query, bool verbose)
     {
         std::cout << "Get vault stored on the computation server" << std::endl;
     }
-    BytesVault vault = cs.getVault(id);
+    BytesVault bv = cs.getVault(id);
+    FuzzyVaultBake vault(bv);
 
     // Real version
-    uint32_t f0 = getf0(vault, query);
+    uint32_t f0 = vault.getf0(query);
     if (f0 == -1)
     {
         if (verbose)
