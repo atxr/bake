@@ -43,19 +43,8 @@ struct Result
 
 int median(vector<int> &v)
 {
-    if (v.empty())
-    {
-        return 0;
-    }
-    auto n = v.size() / 2;
-    nth_element(v.begin(), v.begin() + n, v.end());
-    auto med = v[n];
-    if (!(v.size() & 1))
-    { // If the set size is even
-        auto max_it = max_element(v.begin(), v.begin() + n);
-        med = (*max_it + med) / 2.0;
-    }
-    return med;
+    sort(v.begin(), v.end());
+    return v[v.size() / 2];
 }
 
 Result testOne(string ref, string query)
@@ -130,6 +119,7 @@ int main(int argc, char **argv)
             string imageName(ent->d_name);
             if (imageName.find(".pgm", 0) != string::npos)
             {
+                stringstream ss;
                 string b = imageName.substr(8, 1);
                 string c = imageName.substr(10, 2);
                 bool pad = 1;
@@ -140,9 +130,8 @@ int main(int argc, char **argv)
                     c = c.substr(0, 1);
                 }
 
-                string query = imageName.substr(0, 10) +
-                               to_string(1 + stoi(c) % cMax) +
-                               imageName.substr(11 + pad);
+                ss << imageName.substr(0, 10) << to_string((1 + stoi(c)) % cMax) << imageName.substr(11 + pad);
+                string query = ss.str();
 
                 cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
                 res = testOne(path + imageName, path + query);
@@ -153,9 +142,9 @@ int main(int argc, char **argv)
                 mated[3].push_back(res.full);
                 mated[4].push_back(res.st);
 
-                query = imageName.substr(0, 8) +
-                        to_string(1 + stoi(b) % bMax) +
-                        imageName.substr(9);
+                ss = stringstream();
+                ss << imageName.substr(0, 8) << to_string((2 + stoi(b)) % bMax) << imageName.substr(9);
+                query = ss.str();
 
                 cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
                 res = testOne(path + imageName, path + query);
@@ -187,7 +176,7 @@ int main(int argc, char **argv)
     cout << "Failure: "
          << count(mated[4].begin(), mated[4].end(), 0) * 100 / mated[4].size() << "% | "
          << count(nonmated[4].begin(), nonmated[4].end(), 0) * 100 / nonmated[4].size() << "%" << endl;
-    cout << "Errors: " 
+    cout << "Errors: "
          << count(mated[4].begin(), mated[4].end(), -1) * 100 / mated[4].size() << "% | "
          << count(nonmated[4].begin(), nonmated[4].end(), -1) * 100 / nonmated[4].size() << "%" << endl;
 
