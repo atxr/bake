@@ -22,7 +22,7 @@ echo "openssl already installed"
 
 # install thimble lib
 cd tmp
-git clone https://github.com/btams/thimble
+git clone https://github.com/atxr/thimble
 cd thimble
 make
 sudo make install
