@@ -171,14 +171,14 @@ int main(int argc, char **argv)
     cout << "Test finished, with " << n * 2 << " different key exchanges." << endl;
     cout << "Results: mated | nonmated" << endl;
     cout << "Success: "
-         << count(mated[4].begin(), mated[4].end(), 1) * 100 / mated[4].size() << "% | "
-         << count(nonmated[4].begin(), nonmated[4].end(), 1) * 100 / nonmated[4].size() << "%" << endl;
+         << count(mated[4].begin(), mated[4].end(), 1) << " / " << mated[4].size() << " | "
+         << count(nonmated[4].begin(), nonmated[4].end(), 1) << "/" << nonmated[4].size() << endl;
     cout << "Failure: "
-         << count(mated[4].begin(), mated[4].end(), 0) * 100 / mated[4].size() << "% | "
-         << count(nonmated[4].begin(), nonmated[4].end(), 0) * 100 / nonmated[4].size() << "%" << endl;
+         << count(mated[4].begin(), mated[4].end(), 0) << "/" << mated[4].size() << " | "
+         << count(nonmated[4].begin(), nonmated[4].end(), 0) << "/" << nonmated[4].size() << endl;
     cout << "Errors: "
-         << count(mated[4].begin(), mated[4].end(), -1) * 100 / mated[4].size() << "% | "
-         << count(nonmated[4].begin(), nonmated[4].end(), -1) * 100 / nonmated[4].size() << "%" << endl;
+         << count(mated[4].begin(), mated[4].end(), -1) << "/" << mated[4].size() << " | "
+         << count(nonmated[4].begin(), nonmated[4].end(), -1) << "/" << nonmated[4].size() << endl;
 
     cout << endl;
     cout << "Times: mated | nonmated" << endl;
