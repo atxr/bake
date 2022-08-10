@@ -24,7 +24,7 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
     if (!vault.enroll(ref))
     {
         cout << "Failed to lock the vault with the reference " << ref << endl;
-        exit(1);
+        return false;
     }
     BytesVault bVault = vault.toBytesVault();
 
