@@ -4,13 +4,13 @@
 
 using namespace std;
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    if (argc != 3) 
+    if (argc != 3)
     {
         cout << "Error. Not enough arguments" << endl;
         cout << "Usage: bake <path to reference image> <path to query image>" << endl;
-        exit(1); 
+        exit(1);
     }
 
     // Initialisation
@@ -45,10 +45,22 @@ int main(int argc, char** argv)
     // Verification
 
     cout << "Verification" << endl;
-    if (!c.verify(getMinutiaeView(argv[2])))
+    // permutation::eval may throw an error
+    try
     {
-        cout << "Verify: Query failed" << endl;
-        exit(1);
+        if (!c.verify(getMinutiaeView(argv[2])))
+        {
+            cout << "Verify: Query failed" << endl;
+            exit(1);
+        }
+    }
+    catch (int e)
+    {
+        if (e == 1)
+            cout << "Error: Caught invalid permutation::eval" << endl;
+        else
+            cout << "Caught " << e << endl;
+        exit(e);
     }
     cout << "Verification successful" << endl;
 

@@ -134,7 +134,24 @@ int main(int argc, char **argv)
                 string query = ss.str();
 
                 cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
-                res = testOne(path + imageName, path + query);
+
+                // reorder may throw exception if permutation::eval fails
+                try
+                {
+                    res = testOne(path + imageName, path + query);
+                }
+                catch (int e)
+                {
+                    if (e == 1)
+                    {
+                        // log the error
+                        cout << "Error: Permutation::eval failed" << endl;
+                        // push error status
+                        mated[4].push_back(-1);
+                    }
+                    counter++;
+                    continue;
+                }
 
                 mated[0].push_back(res.init);
                 mated[1].push_back(res.enroll);
@@ -147,7 +164,24 @@ int main(int argc, char **argv)
                 query = ss.str();
 
                 cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
-                res = testOne(path + imageName, path + query);
+
+                // reorder may throw exception if permutation::eval fails
+                try
+                {
+                    res = testOne(path + imageName, path + query);
+                }
+                catch (int e)
+                {
+                    if (e == 1)
+                    {
+                        // log the error
+                        cout << "Error: Permutation::eval failed" << endl;
+                        // push error status
+                        nonmated[4].push_back(-1);
+                    }
+                    counter++;
+                    continue;
+                }
 
                 nonmated[0].push_back(res.init);
                 nonmated[1].push_back(res.enroll);
