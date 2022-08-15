@@ -71,12 +71,19 @@ Result testOne(string ref, string query)
     // Enrollment
 
     start = chrono::high_resolution_clock::now();
-    if (!c.enroll(getMinutiaeView(ref), false))
+    MinutiaeView view = getMinutiaeView(ref);
+    auto stop1 = chrono::high_resolution_clock::now();
+    if (!c.enroll(view, false))
     {
         return Result(init);
     }
 
     stop = chrono::high_resolution_clock::now();
+    int viewTime = chrono::duration_cast<chrono::milliseconds>(stop1 - start).count();
+    ofstream Out("out/view.chrono");
+    Out << viewTime << endl;
+    Out.close();
+
     int enroll = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
 
     // Verification

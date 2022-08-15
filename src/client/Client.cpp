@@ -1,5 +1,7 @@
 #include "Client.hpp"
 #include <iostream>
+#include <fstream>
+#include <chrono>
 
 Client::Client(ComputationServer cs) : cs(cs) {}
 unsigned int Client::count = 0;
@@ -21,7 +23,10 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
     // Real version
     // Lock the vault
     FuzzyVaultBake vault(mcytWidth, mcytHeight, mcytDpi);
-    if (!vault.enroll(ref))
+    auto startEnroll = chrono::high_resolution_clock::now();
+    bool stEnroll = vault.enroll(ref);
+    auto stopEnroll = chrono::high_resolution_clock::now();
+    if (!stEnroll)
     {
         cout << "Failed to lock the vault with the reference " << ref << endl;
         return false;
@@ -44,7 +49,9 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
     }
 
     // Generate the blinded point
+    auto startBlind = chrono::high_resolution_clock::now();
     BlindedPair bp = blind(x, ECGroup);
+    auto stopBlind = chrono::high_resolution_clock::now();
     Point B = bp.first;
     BigInt r = bp.second;
 
@@ -61,7 +68,9 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
     }
 
     // Compute key pair from the signed point
+    auto startUnblind = chrono::high_resolution_clock::now();
     Point U = unblind(S, r);
+    auto stopUnblind = chrono::high_resolution_clock::now();
     BigInt csk_r = U.toHash();
     Point Cpk_r = G.mul(csk_r);
 
@@ -75,6 +84,22 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
     {
         std::cout << "Failed: Storing" << std::endl;
     }
+
+    int tBlind = chrono::duration_cast<chrono::milliseconds>(stopBlind - startBlind).count();
+    ofstream OutBlind("out/blind.chrono", ios_base::app);
+    OutBlind << tBlind << endl;
+    OutBlind.close();
+
+    int tUnblind = chrono::duration_cast<chrono::milliseconds>(stopUnblind - startUnblind).count();
+    ofstream OutUnblind("out/unblind.chrono", ios_base::app);
+    OutUnblind << tUnblind << endl;
+    OutUnblind.close();
+
+    int tEnroll = chrono::duration_cast<chrono::milliseconds>(stopEnroll - startEnroll).count();
+    ofstream OutEnroll("out/enroll.chrono", ios_base::app);
+    OutEnroll << tEnroll << endl;
+    OutEnroll.close();
+
     return st;
 }
 
@@ -89,7 +114,9 @@ bool Client::verify(MinutiaeView query, bool verbose)
     FuzzyVaultBake vault(bv);
 
     // Real version
+    auto startRecons = chrono::high_resolution_clock::now();
     uint32_t f0 = vault.getf0(query);
+    auto stopRecons = chrono::high_resolution_clock::now();
     if (f0 == -1)
     {
         if (verbose)
@@ -120,9 +147,11 @@ bool Client::verify(MinutiaeView query, bool verbose)
     std::tie(B, r) = blind(x, ECGroup);
 
     // Generate a new exchange key pair
+    auto startKeygen = chrono::high_resolution_clock::now();
     BigInt csk_e;
     Point Cpk_e;
     std::tie(csk_e, Cpk_e) = keygen(G, ECGroup);
+    auto stopKeygen = chrono::high_resolution_clock::now();
 
     // Second communication with the server
     if (verbose)
@@ -139,15 +168,19 @@ bool Client::verify(MinutiaeView query, bool verbose)
     // unblind the signed point
     Point U = unblind(sKeychain.S, r);
     BigInt csk_p = U.toHash();
+    auto startPubgen = chrono::high_resolution_clock::now();
     Point Cpk_p = getPublicKey(csk_p, G);
+    auto stopPubgen = chrono::high_resolution_clock::now();
 
     // compute kc and H(kc)
+    auto startDecap = chrono::high_resolution_clock::now();
     BigInt kc = KDF(sKeychain.Spk_e.mul(csk_e),
                     sKeychain.Spk.mul(csk_e),
                     sKeychain.Spk_e.mul(csk_p),
                     Cpk_e, sKeychain.Spk_e,
                     Cpk_p, sKeychain.Spk);
     BigInt h_kc = kc.toHash();
+    auto stopDecap = chrono::high_resolution_clock::now();
 
     // compare the final keys
     if (verbose)
@@ -159,5 +192,35 @@ bool Client::verify(MinutiaeView query, bool verbose)
         BN_print_fp(stdout, sKeychain.h_ks.n);
         std::cout << std::endl;
     }
-    return h_kc == sKeychain.h_ks;
+
+    auto startHash = chrono::high_resolution_clock::now();
+    bool result = h_kc == sKeychain.h_ks;
+    auto stopHash = chrono::high_resolution_clock::now();
+
+    int tRecons = chrono::duration_cast<chrono::milliseconds>(stopRecons - startRecons).count();
+    ofstream OutRecons("out/recons.chrono", ios_base::app);
+    OutRecons << tRecons << endl;
+    OutRecons.close();
+
+    int tDecap = chrono::duration_cast<chrono::milliseconds>(stopDecap - startDecap).count();
+    ofstream OutDecap("out/decap.chrono", ios_base::app);
+    OutDecap << tDecap << endl;
+    OutDecap.close();
+
+    int tHash = chrono::duration_cast<chrono::milliseconds>(stopHash - startHash).count();
+    ofstream OutHash("out/hash.chrono", ios_base::app);
+    OutHash << tHash << endl;
+    OutHash.close();
+
+    int tKeygen = chrono::duration_cast<chrono::milliseconds>(stopKeygen - startKeygen).count();
+    ofstream OutKeygen("out/keygen.chrono", ios_base::app);
+    OutKeygen << tKeygen << endl;
+    OutKeygen.close();
+
+    int tPubgen = chrono::duration_cast<chrono::milliseconds>(stopPubgen - startPubgen).count();
+    ofstream OutPubgen("out/pubgen.chrono", ios_base::app);
+    OutPubgen << tPubgen << endl;
+    OutPubgen.close();
+
+    return result;
 }
