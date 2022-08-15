@@ -40,7 +40,7 @@ bool testOne(string ref, string query)
     }
 
     // Verification
-    return c.verify(getMinutiaeView(query));
+    return c.verify(getMinutiaeView(query), false);
 }
 
 int main(int argc, char **argv)
