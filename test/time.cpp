@@ -79,8 +79,8 @@ Result testOne(string ref, string query)
     }
 
     stop = chrono::high_resolution_clock::now();
-    int viewTime = chrono::duration_cast<chrono::milliseconds>(stop1 - start).count();
-    ofstream Out("out/view.chrono");
+    int viewTime = chrono::duration_cast<chrono::microseconds>(stop1 - start).count();
+    ofstream Out("out/view.chrono", ios_base::app);
     Out << viewTime << endl;
     Out.close();
 

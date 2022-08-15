@@ -85,17 +85,17 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
         std::cout << "Failed: Storing" << std::endl;
     }
 
-    int tBlind = chrono::duration_cast<chrono::milliseconds>(stopBlind - startBlind).count();
+    int tBlind = chrono::duration_cast<chrono::microseconds>(stopBlind - startBlind).count();
     ofstream OutBlind("out/blind.chrono", ios_base::app);
     OutBlind << tBlind << endl;
     OutBlind.close();
 
-    int tUnblind = chrono::duration_cast<chrono::milliseconds>(stopUnblind - startUnblind).count();
+    int tUnblind = chrono::duration_cast<chrono::microseconds>(stopUnblind - startUnblind).count();
     ofstream OutUnblind("out/unblind.chrono", ios_base::app);
     OutUnblind << tUnblind << endl;
     OutUnblind.close();
 
-    int tEnroll = chrono::duration_cast<chrono::milliseconds>(stopEnroll - startEnroll).count();
+    int tEnroll = chrono::duration_cast<chrono::microseconds>(stopEnroll - startEnroll).count();
     ofstream OutEnroll("out/enroll.chrono", ios_base::app);
     OutEnroll << tEnroll << endl;
     OutEnroll.close();
@@ -197,27 +197,27 @@ bool Client::verify(MinutiaeView query, bool verbose)
     bool result = h_kc == sKeychain.h_ks;
     auto stopHash = chrono::high_resolution_clock::now();
 
-    int tRecons = chrono::duration_cast<chrono::milliseconds>(stopRecons - startRecons).count();
+    int tRecons = chrono::duration_cast<chrono::microseconds>(stopRecons - startRecons).count();
     ofstream OutRecons("out/recons.chrono", ios_base::app);
     OutRecons << tRecons << endl;
     OutRecons.close();
 
-    int tDecap = chrono::duration_cast<chrono::milliseconds>(stopDecap - startDecap).count();
+    int tDecap = chrono::duration_cast<chrono::microseconds>(stopDecap - startDecap).count();
     ofstream OutDecap("out/decap.chrono", ios_base::app);
     OutDecap << tDecap << endl;
     OutDecap.close();
 
-    int tHash = chrono::duration_cast<chrono::milliseconds>(stopHash - startHash).count();
+    int tHash = chrono::duration_cast<chrono::microseconds>(stopHash - startHash).count();
     ofstream OutHash("out/hash.chrono", ios_base::app);
     OutHash << tHash << endl;
     OutHash.close();
 
-    int tKeygen = chrono::duration_cast<chrono::milliseconds>(stopKeygen - startKeygen).count();
+    int tKeygen = chrono::duration_cast<chrono::microseconds>(stopKeygen - startKeygen).count();
     ofstream OutKeygen("out/keygen.chrono", ios_base::app);
     OutKeygen << tKeygen << endl;
     OutKeygen.close();
 
-    int tPubgen = chrono::duration_cast<chrono::milliseconds>(stopPubgen - startPubgen).count();
+    int tPubgen = chrono::duration_cast<chrono::microseconds>(stopPubgen - startPubgen).count();
     ofstream OutPubgen("out/pubgen.chrono", ios_base::app);
     OutPubgen << tPubgen << endl;
     OutPubgen.close();

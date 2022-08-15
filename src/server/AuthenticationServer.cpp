@@ -17,12 +17,10 @@ Point AuthenticationServer::sign(Point B)
     Point S = signPoint(B,k);
     auto stop = chrono::high_resolution_clock::now();
 
-    int t = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
+    int t = chrono::duration_cast<chrono::microseconds>(stop - start).count();
     ofstream Out("out/sign.chrono", ios_base::app);
     Out << t << endl;
     Out.close();
     
-    cout << t << endl;
-
     return S;
 }
