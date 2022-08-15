@@ -15,7 +15,7 @@ set (app
 	test/hash.cpp
 	test/fuzzyVault.cpp
 	test/bake.cpp
-	test/time.cpp
+	test/test.cpp
 )
 set (sources
 	src/core/Core.cpp
