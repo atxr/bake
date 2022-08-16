@@ -6,8 +6,8 @@ class Client
 public:
     Client(ComputationServer cs);
     bool init();
-    bool enroll(MinutiaeView ref, bool verbose=true);
-    bool verify(MinutiaeView query, bool verbose=true);
+    bool enroll(MinutiaeView ref, int k=10, bool verbose=true);
+    bool verify(MinutiaeView query, int k=10, bool verbose=true);
 
 
 private:

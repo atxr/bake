@@ -17,42 +17,12 @@
 #include <algorithm>
 
 using namespace std;
-struct Result
-{
-    int init, enroll, verify, full, st;
-    Result()
-    {
-        init = enroll = verify = full = st = -1;
-    }
 
-    Result(int i)
-    {
-        init = i;
-        enroll = verify = full = st = -1;
-    }
-
-    Result(int i, int e, int v, int f, int s)
-    {
-        init = i;
-        enroll = e;
-        verify = v;
-        full = f;
-        st = s;
-    }
-};
-
-int median(vector<int> &v)
-{
-    sort(v.begin(), v.end());
-    return v[v.size() / 2];
-}
-
-Result testOne(string ref, string query)
+bool testOne(string ref, string query, int k)
 {
     // Initialisation
-    auto startFull = chrono::high_resolution_clock::now();
-
     auto start = chrono::high_resolution_clock::now();
+
     Group ECGroup;
     // Init the servers
     AuthenticationServer as(ECGroup);
@@ -62,59 +32,45 @@ Result testOne(string ref, string query)
     Client c(cs);
     if (!c.init())
     {
-        return Result();
+        throw 2;
     }
-
-    auto stop = chrono::high_resolution_clock::now();
-    int init = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
 
     // Enrollment
-
-    start = chrono::high_resolution_clock::now();
+    auto start1 = chrono::high_resolution_clock::now();
     MinutiaeView view = getMinutiaeView(ref);
-    auto stop1 = chrono::high_resolution_clock::now();
-    if (!c.enroll(view, false))
+    auto stop = chrono::high_resolution_clock::now();
+    if (!c.enroll(view, k, false))
     {
-        return Result(init);
+        throw 3;
     }
-
-    stop = chrono::high_resolution_clock::now();
-    int viewTime = chrono::duration_cast<chrono::microseconds>(stop1 - start).count();
-    ofstream Out("out/view.chrono", ios_base::app);
-    Out << viewTime << endl;
-    Out.close();
-
-    int enroll = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
 
     // Verification
-
-    start = chrono::high_resolution_clock::now();
-    int st = c.verify(getMinutiaeView(query), false) ? 1 : 0;
+    bool st = c.verify(getMinutiaeView(query), k, false);
 
     stop = chrono::high_resolution_clock::now();
-    int verify = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
-    int full = chrono::duration_cast<chrono::milliseconds>(stop - startFull).count();
-    return Result(init, enroll, verify, full, st);
+    int fullTime = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
+    ofstream OutFull("out/full" + to_string(k) + ".chrono", ios_base::app);
+    OutFull << fullTime << endl;
+    OutFull.close();
+
+    int viewTime = chrono::duration_cast<chrono::microseconds>(stop - start1).count();
+    ofstream OutView("out/view" + to_string(k) + ".chrono", ios_base::app);
+    OutView << viewTime << endl;
+    OutView.close();
+
+    return st;
 }
 
-int main(int argc, char **argv)
+void testOnek(string path, int n, int k)
 {
-    if (argc != 3)
-    {
-        cout << "Error. Not enough arguments" << endl;
-        cout << "Usage: bake <path to mcyt dp pgm images> <number of images for the test>" << endl;
-        exit(1);
-    }
-
-    string path = argv[1];
-    int n = stoi(argv[2]);
     int aMax(434);
     int bMax(9);
     int cMax(11);
 
-    vector<int> mated[5];
-    vector<int> nonmated[5];
-    Result res;
+    int mated(0);
+    int nonmated(0);
+    int error1(0);
+    int error2(0);
 
     DIR *dir;
     struct dirent *ent;
@@ -145,26 +101,16 @@ int main(int argc, char **argv)
                 // reorder may throw exception if permutation::eval fails
                 try
                 {
-                    res = testOne(path + imageName, path + query);
+                    if (testOne(path + imageName, path + query, k))
+                        mated++;
                 }
                 catch (int e)
                 {
-                    if (e == 1)
-                    {
-                        // log the error
-                        cout << "Error: Permutation::eval failed" << endl;
-                        // push error status
-                        mated[4].push_back(-1);
-                    }
+                    cout << "Caught: " << e << endl;
+                    error1++;
                     counter++;
                     continue;
                 }
-
-                mated[0].push_back(res.init);
-                mated[1].push_back(res.enroll);
-                mated[2].push_back(res.verify);
-                mated[3].push_back(res.full);
-                mated[4].push_back(res.st);
 
                 ss = stringstream();
                 ss << imageName.substr(0, 8) << to_string((2 + stoi(b)) % bMax) << imageName.substr(9);
@@ -175,26 +121,16 @@ int main(int argc, char **argv)
                 // reorder may throw exception if permutation::eval fails
                 try
                 {
-                    res = testOne(path + imageName, path + query);
+                    if (testOne(path + imageName, path + query, k))
+                        nonmated++;
                 }
                 catch (int e)
                 {
-                    if (e == 1)
-                    {
-                        // log the error
-                        cout << "Error: Permutation::eval failed" << endl;
-                        // push error status
-                        nonmated[4].push_back(-1);
-                    }
+                    cout << "Caught: " << e << endl;
+                    error2++;
                     counter++;
                     continue;
                 }
-
-                nonmated[0].push_back(res.init);
-                nonmated[1].push_back(res.enroll);
-                nonmated[2].push_back(res.verify);
-                nonmated[3].push_back(res.full);
-                nonmated[4].push_back(res.st);
 
                 counter++;
             }
@@ -209,24 +145,41 @@ int main(int argc, char **argv)
     }
 
     cout << endl;
-    cout << "Test finished, with " << n * 2 << " different key exchanges." << endl;
+    cout << "Test finished, with " << counter * 2 << " different key exchanges." << endl;
     cout << "Results: mated | nonmated" << endl;
     cout << "Success: "
-         << count(mated[4].begin(), mated[4].end(), 1) << " / " << mated[4].size() << " | "
-         << count(nonmated[4].begin(), nonmated[4].end(), 1) << "/" << nonmated[4].size() << endl;
+         << mated << "/" << counter << " | "
+         << nonmated << "/" << counter << endl;
     cout << "Failure: "
-         << count(mated[4].begin(), mated[4].end(), 0) << "/" << mated[4].size() << " | "
-         << count(nonmated[4].begin(), nonmated[4].end(), 0) << "/" << nonmated[4].size() << endl;
+         << counter - mated - error1 << "/" << counter << " | "
+         << counter - nonmated - error2 << "/" << counter << endl;
     cout << "Errors: "
-         << count(mated[4].begin(), mated[4].end(), -1) << "/" << mated[4].size() << " | "
-         << count(nonmated[4].begin(), nonmated[4].end(), -1) << "/" << nonmated[4].size() << endl;
+         << error1 << "/" << counter << " | "
+         << error2 << "/" << counter << endl;
+}
 
-    cout << endl;
-    cout << "Times: mated | nonmated" << endl;
-    cout << "Init: " << median(mated[0]) << "ms | " << median(nonmated[0]) << "ms" << endl;
-    cout << "Enroll: " << median(mated[1]) << "ms | " << median(nonmated[1]) << "ms" << endl;
-    cout << "Verify: " << median(mated[2]) << "ms | " << median(nonmated[2]) << "ms" << endl;
-    cout << "Full: " << median(mated[3]) << "ms | " << median(nonmated[3]) << "ms" << endl;
+int main(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        cout << "Error. Not enough arguments" << endl;
+        cout << "Usage: bake <path to mcyt dp pgm images> <number of images for the test>" << endl;
+        exit(1);
+    }
+
+    string path = argv[1];
+    int n = stoi(argv[2]);
+
+    auto ks = {8, 9, 10, 11, 12};
+    for (int k : ks)
+    {
+        cout << endl
+             << "Test for k = " << k << endl
+             << endl;
+        testOnek(path, n, k);
+        cout << endl
+             << "--------------------------------------------------------------" << endl;
+    }
 
     return 0;
 }

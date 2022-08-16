@@ -11,14 +11,14 @@ AuthenticationServer::AuthenticationServer(Group ECGroup) : ECGroup(ECGroup)
 
 Group *AuthenticationServer::getGroup() { return &ECGroup; }
 
-Point AuthenticationServer::sign(Point B)
+Point AuthenticationServer::sign(Point B, int ks)
 {
     auto start = chrono::high_resolution_clock::now();
     Point S = signPoint(B,k);
     auto stop = chrono::high_resolution_clock::now();
 
     int t = chrono::duration_cast<chrono::microseconds>(stop - start).count();
-    ofstream Out("out/sign.chrono", ios_base::app);
+    ofstream Out("out/sign" + to_string(ks) + ".chrono", ios_base::app);
     Out << t << endl;
     Out.close();
     

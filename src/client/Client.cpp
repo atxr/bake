@@ -16,13 +16,13 @@ bool Client::init()
     return true;
 }
 
-bool Client::enroll(MinutiaeView ref, bool verbose)
+bool Client::enroll(MinutiaeView ref, int k, bool verbose)
 {
     id = ++count;
 
     // Real version
     // Lock the vault
-    FuzzyVaultBake vault(mcytWidth, mcytHeight, mcytDpi);
+    FuzzyVaultBake vault(mcytWidth, mcytHeight, mcytDpi, k);
     auto startEnroll = chrono::high_resolution_clock::now();
     bool stEnroll = vault.enroll(ref);
     auto stopEnroll = chrono::high_resolution_clock::now();
@@ -60,7 +60,7 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
     {
         std::cout << "Signing" << std::endl;
     }
-    Point S = cs.signToEnroll(bVault, B, id);
+    Point S = cs.signToEnroll(bVault, B, id, k);
     if (S.is_empty())
     {
         std::cout << "Failed: S is empty" << std::endl;
@@ -86,24 +86,24 @@ bool Client::enroll(MinutiaeView ref, bool verbose)
     }
 
     int tBlind = chrono::duration_cast<chrono::microseconds>(stopBlind - startBlind).count();
-    ofstream OutBlind("out/blind.chrono", ios_base::app);
+    ofstream OutBlind("out/blind" + to_string(k) + ".chrono", ios_base::app);
     OutBlind << tBlind << endl;
     OutBlind.close();
 
     int tUnblind = chrono::duration_cast<chrono::microseconds>(stopUnblind - startUnblind).count();
-    ofstream OutUnblind("out/unblind.chrono", ios_base::app);
+    ofstream OutUnblind("out/unblind" + to_string(k) + ".chrono", ios_base::app);
     OutUnblind << tUnblind << endl;
     OutUnblind.close();
 
     int tEnroll = chrono::duration_cast<chrono::microseconds>(stopEnroll - startEnroll).count();
-    ofstream OutEnroll("out/enroll.chrono", ios_base::app);
+    ofstream OutEnroll("out/enroll" + to_string(k) + ".chrono", ios_base::app);
     OutEnroll << tEnroll << endl;
     OutEnroll.close();
 
     return st;
 }
 
-bool Client::verify(MinutiaeView query, bool verbose)
+bool Client::verify(MinutiaeView query, int k, bool verbose)
 {
     // First communication with the server
     if (verbose)
@@ -158,7 +158,7 @@ bool Client::verify(MinutiaeView query, bool verbose)
     {
         std::cout << "Get signed server keychain" << std::endl;
     }
-    ServerKeychain sKeychain = cs.signToVerify(id, B, Cpk_e);
+    ServerKeychain sKeychain = cs.signToVerify(id, B, Cpk_e, k);
     if (sKeychain.st == false)
     {
         std::cout << "Failed: server keychain signing failed" << std::endl;
@@ -198,27 +198,27 @@ bool Client::verify(MinutiaeView query, bool verbose)
     auto stopHash = chrono::high_resolution_clock::now();
 
     int tRecons = chrono::duration_cast<chrono::microseconds>(stopRecons - startRecons).count();
-    ofstream OutRecons("out/recons.chrono", ios_base::app);
+    ofstream OutRecons("out/recons" + to_string(k) + ".chrono", ios_base::app);
     OutRecons << tRecons << endl;
     OutRecons.close();
 
     int tDecap = chrono::duration_cast<chrono::microseconds>(stopDecap - startDecap).count();
-    ofstream OutDecap("out/decap.chrono", ios_base::app);
+    ofstream OutDecap("out/decap" + to_string(k) + ".chrono", ios_base::app);
     OutDecap << tDecap << endl;
     OutDecap.close();
 
     int tHash = chrono::duration_cast<chrono::microseconds>(stopHash - startHash).count();
-    ofstream OutHash("out/hash.chrono", ios_base::app);
+    ofstream OutHash("out/hash" + to_string(k) + ".chrono", ios_base::app);
     OutHash << tHash << endl;
     OutHash.close();
 
     int tKeygen = chrono::duration_cast<chrono::microseconds>(stopKeygen - startKeygen).count();
-    ofstream OutKeygen("out/keygen.chrono", ios_base::app);
+    ofstream OutKeygen("out/keygen" + to_string(k) + ".chrono", ios_base::app);
     OutKeygen << tKeygen << endl;
     OutKeygen.close();
 
     int tPubgen = chrono::duration_cast<chrono::microseconds>(stopPubgen - startPubgen).count();
-    ofstream OutPubgen("out/pubgen.chrono", ios_base::app);
+    ofstream OutPubgen("out/pubgen" + to_string(k) + ".chrono", ios_base::app);
     OutPubgen << tPubgen << endl;
     OutPubgen.close();
 

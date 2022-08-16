@@ -18,7 +18,7 @@ Group *ComputationServer::getGroup() { return as.getGroup(); }
 Point ComputationServer::getPublicGenerator() { return G; }
 BytesVault ComputationServer::getVault(unsigned int id) { return clients[id]->first; }
 
-ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e)
+ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e, int k)
 {
     ServerKeychain keychain;
     keychain.st = false;
@@ -43,17 +43,17 @@ ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e
     auto stop = chrono::high_resolution_clock::now();
 
     int t = chrono::duration_cast<chrono::microseconds>(stop - start).count();
-    ofstream Out("out/encap.chrono", ios_base::app);
+    ofstream Out("out/encap" + to_string(k) + ".chrono", ios_base::app);
     Out << t << endl;
     Out.close();
 
     return keychain;
 }
 
-Point ComputationServer::signToEnroll(BytesVault vault, Point B, unsigned int id)
+Point ComputationServer::signToEnroll(BytesVault vault, Point B, unsigned int id, int k)
 {
     // TODO store temp vault and id
-    return as.sign(B);
+    return as.sign(B, k);
 }
 
 bool ComputationServer::store(BytesVault vault, unsigned int id, Point Cpk_r)
@@ -62,11 +62,11 @@ bool ComputationServer::store(BytesVault vault, unsigned int id, Point Cpk_r)
     return true;
 }
 
-ServerKeychain ComputationServer::signToVerify(unsigned int id, Point B, Point Cpk_e)
+ServerKeychain ComputationServer::signToVerify(unsigned int id, Point B, Point Cpk_e, int k)
 {
-    ServerKeychain keychain = getServerKeychain(id, Cpk_e);
+    ServerKeychain keychain = getServerKeychain(id, Cpk_e, k);
 
-    keychain.S = as.sign(B);
+    keychain.S = as.sign(B, k);
     keychain.st = true;
     return keychain;
 }
