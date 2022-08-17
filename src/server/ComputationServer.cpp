@@ -43,7 +43,7 @@ ServerKeychain ComputationServer::getServerKeychain(unsigned int id, Point Cpk_e
     auto stop = chrono::high_resolution_clock::now();
 
     int t = chrono::duration_cast<chrono::microseconds>(stop - start).count();
-    ofstream Out("out/encap" + to_string(k) + ".chrono", ios_base::app);
+    ofstream Out("out/encap_" + to_string(k) + ".chrono", ios_base::app);
     Out << t << endl;
     Out.close();
 

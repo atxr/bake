@@ -49,12 +49,12 @@ bool testOne(string ref, string query, int k)
 
     stop = chrono::high_resolution_clock::now();
     int fullTime = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
-    ofstream OutFull("out/full" + to_string(k) + ".chrono", ios_base::app);
+    ofstream OutFull("out/full_" + to_string(k) + ".chrono", ios_base::app);
     OutFull << fullTime << endl;
     OutFull.close();
 
     int viewTime = chrono::duration_cast<chrono::microseconds>(stop - start1).count();
-    ofstream OutView("out/view" + to_string(k) + ".chrono", ios_base::app);
+    ofstream OutView("out/view_" + to_string(k) + ".chrono", ios_base::app);
     OutView << viewTime << endl;
     OutView.close();
 

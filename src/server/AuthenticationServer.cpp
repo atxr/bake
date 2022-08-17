@@ -18,7 +18,7 @@ Point AuthenticationServer::sign(Point B, int ks)
     auto stop = chrono::high_resolution_clock::now();
 
     int t = chrono::duration_cast<chrono::microseconds>(stop - start).count();
-    ofstream Out("out/sign" + to_string(ks) + ".chrono", ios_base::app);
+    ofstream Out("out/sign_" + to_string(ks) + ".chrono", ios_base::app);
     Out << t << endl;
     Out.close();
     
