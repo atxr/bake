@@ -38,7 +38,7 @@ bool testOne(string ref, string query, int k)
     // Enrollment
     auto start1 = chrono::high_resolution_clock::now();
     MinutiaeView view = getMinutiaeView(ref);
-    auto stop = chrono::high_resolution_clock::now();
+    auto stop1 = chrono::high_resolution_clock::now();
     if (!c.enroll(view, k, false))
     {
         throw 3;
@@ -47,13 +47,13 @@ bool testOne(string ref, string query, int k)
     // Verification
     bool st = c.verify(getMinutiaeView(query), k, false);
 
-    stop = chrono::high_resolution_clock::now();
+    auto stop = chrono::high_resolution_clock::now();
     int fullTime = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
+    int viewTime = chrono::duration_cast<chrono::microseconds>(stop1 - start1).count();
     ofstream OutFull("out/full_" + to_string(k) + ".chrono", ios_base::app);
     OutFull << fullTime << endl;
     OutFull.close();
 
-    int viewTime = chrono::duration_cast<chrono::microseconds>(stop - start1).count();
     ofstream OutView("out/view_" + to_string(k) + ".chrono", ios_base::app);
     OutView << viewTime << endl;
     OutView.close();
