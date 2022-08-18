@@ -97,7 +97,7 @@ bool Client::enroll(MinutiaeView ref, int k, bool verbose)
     OutUnblind.close();
 
     int tEnroll = chrono::duration_cast<chrono::microseconds>(stopEnroll - startEnroll).count();
-    ofstream OutEnroll("out/hide" + to_string(k) + ".chrono", ios_base::app);
+    ofstream OutEnroll("out/hide_" + to_string(k) + ".chrono", ios_base::app);
     OutEnroll << tEnroll << endl;
     OutEnroll.close();
 
