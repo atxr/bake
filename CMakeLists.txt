@@ -15,6 +15,7 @@ set (app
 	test/hash.cpp
 	test/fuzzyVault.cpp
 	test/bake.cpp
+	test/test.cpp
 	test/time.cpp
 )
 set (sources
