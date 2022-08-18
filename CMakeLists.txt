@@ -16,6 +16,7 @@ set (app
 	test/fuzzyVault.cpp
 	test/bake.cpp
 	test/test.cpp
+	test/time.cpp
 )
 set (sources
 	src/core/Core.cpp

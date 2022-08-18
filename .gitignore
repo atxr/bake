@@ -36,5 +36,6 @@ build
 .vscode
 vgcore*
 
-# test
+#test files
 out
+results

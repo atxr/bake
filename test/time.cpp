@@ -22,9 +22,8 @@ using namespace std;
 bool testOne(string ref, string query, int k)
 {
     // Initialisation
-    auto startFull = chrono::high_resolution_clock::now();
-
     auto start = chrono::high_resolution_clock::now();
+
     Group ECGroup;
     // Init the servers
     AuthenticationServer as(ECGroup);
@@ -200,5 +199,6 @@ int main(int argc, char **argv)
         cout << endl
              << "--------------------------------------------------------------" << endl;
     }
+
     return 0;
 }

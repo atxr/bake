@@ -17,12 +17,12 @@ public:
     Group* getGroup();
     Point getPublicGenerator();
     BytesVault getVault(unsigned int id);
-    Point signToEnroll(BytesVault vault, Point B, unsigned int id);
-    ServerKeychain signToVerify(unsigned int id, Point B, Point Cpk_e);
+    Point signToEnroll(BytesVault vault, Point B, unsigned int id, int k=10);
+    ServerKeychain signToVerify(unsigned int id, Point B, Point Cpk_e, int k=10);
     bool store(BytesVault vault, unsigned int id, Point Cpk_r);
 
 private:
-    ServerKeychain getServerKeychain(unsigned int id, Point Cpk_e);
+    ServerKeychain getServerKeychain(unsigned int id, Point Cpk_e, int k=10);
 
     AuthenticationServer as;
     Group *ECGroup;
