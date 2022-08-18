@@ -10,6 +10,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include "client/Client.hpp"
 #include <chrono>
 #include <dirent.h>
@@ -63,18 +64,20 @@ bool testOne(string ref, string query, int k)
 
 void testOnek(string path, int n, int k)
 {
-    int aMax(434);
-    int bMax(9);
-    int cMax(11);
+    int aMax(330);
+    int bMax(3);
+    vector<int> aDone;
 
     int mated(0);
     int nonmated(0);
     int error1(0);
     int error2(0);
+    int count1 = 0;
+    int count2 = 0;
 
     DIR *dir;
     struct dirent *ent;
-    int counter = 0;
+    int counter(0);
     if ((dir = opendir(path.c_str())) != NULL)
     {
         while ((ent = readdir(dir)) != NULL && counter < n)
@@ -82,57 +85,75 @@ void testOnek(string path, int n, int k)
             string imageName(ent->d_name);
             if (imageName.find(".pgm", 0) != string::npos)
             {
-                stringstream ss;
-                string b = imageName.substr(8, 1);
-                string c = imageName.substr(10, 2);
-                bool pad = 1;
+                string a = imageName.substr(0, 3);
+                string b = imageName.substr(4, 1);
 
-                if (c.find(".") != string::npos)
+                if (find(aDone.begin(), aDone.end(), stoi(a)) == aDone.end())
                 {
-                    pad = 0;
-                    c = c.substr(0, 1);
-                }
+                    cout << "Test individual " << a << endl;
+                    for (int i = 1; i < bMax; i++)
+                    {
+                        stringstream ss;
+                        ss << a << "_" << to_string((i + stoi(b)) % bMax) << ".pgm";
+                        string query = ss.str();
 
-                ss << imageName.substr(0, 10) << to_string((1 + stoi(c)) % cMax) << imageName.substr(11 + pad);
-                string query = ss.str();
+                        cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
 
-                cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
+                        // reorder may throw exception if permutation::eval fails
+                        try
+                        {
+                            if (testOne(path + imageName, path + query, k))
+                                mated++;
+                        }
+                        catch (int e)
+                        {
+                            cout << "Caught: " << e << endl;
+                            error1++;
+                            count1++;
+                            continue;
+                        }
+                        count1++;
+                    }
 
-                // reorder may throw exception if permutation::eval fails
-                try
-                {
-                    if (testOne(path + imageName, path + query, k))
-                        mated++;
-                }
-                catch (int e)
-                {
-                    cout << "Caught: " << e << endl;
-                    error1++;
+                    for (int i = 0; i < 7; i++)
+                    {
+                        int r = rand() % (aMax - 1) + 1;
+
+                        stringstream ss;
+                        ss = stringstream();
+                        ss << a << "_" << i % bMax << ".pgm";
+                        string probe = ss.str();
+
+                        ss = stringstream();
+                        string ind = to_string((r + stoi(a)) % aMax);
+                        for (int z = ind.size(); z < 3; z++)
+                        {
+                            ind = "0" + ind;
+                        }
+                        ss << ind << "_0.pgm";
+                        string query = ss.str();
+
+                        cout << counter << "/" << n << ": " << path << probe << " VS " << path << query << endl;
+
+                        // reorder may throw exception if permutation::eval fails
+                        try
+                        {
+                            if (testOne(path + probe, path + query, k))
+                                nonmated++;
+                        }
+                        catch (int e)
+                        {
+                            cout << "Caught: " << e << endl;
+                            error2++;
+                            count2++;
+                            continue;
+                        }
+                        count2++;
+                    }
+
                     counter++;
-                    continue;
+                    aDone.push_back(stoi(a));
                 }
-
-                ss = stringstream();
-                ss << imageName.substr(0, 8) << to_string((2 + stoi(b)) % bMax) << imageName.substr(9);
-                query = ss.str();
-
-                cout << counter << "/" << n << ": " << path << imageName << " VS " << path << query << endl;
-
-                // reorder may throw exception if permutation::eval fails
-                try
-                {
-                    if (testOne(path + imageName, path + query, k))
-                        nonmated++;
-                }
-                catch (int e)
-                {
-                    cout << "Caught: " << e << endl;
-                    error2++;
-                    counter++;
-                    continue;
-                }
-
-                counter++;
             }
         }
         closedir(dir);
@@ -145,17 +166,15 @@ void testOnek(string path, int n, int k)
     }
 
     cout << endl;
-    cout << "Test finished, with " << counter * 2 << " different key exchanges." << endl;
-    cout << "Results: mated | nonmated" << endl;
-    cout << "Success: "
-         << mated << "/" << counter << " | "
-         << nonmated << "/" << counter << endl;
-    cout << "Failure: "
-         << counter - mated - error1 << "/" << counter << " | "
-         << counter - nonmated - error2 << "/" << counter << endl;
-    cout << "Errors: "
-         << error1 << "/" << counter << " | "
-         << error2 << "/" << counter << endl;
+    ofstream Out("out/" + to_string(k) + ".res");
+    Out << "Test finished, with " << counter << " different probe individual for k = " << k << endl;
+    Out << mated << "/" << count1 << endl
+        << nonmated << "/" << count2 << endl;
+    Out << count1 - mated - error1 << "/" << count1 << endl
+        << count2 - nonmated - error2 << "/" << count2 << endl;
+    Out << error1 << "/" << count1 << endl
+        << error2 << "/" << count2 << endl;
+    Out.close();
 }
 
 int main(int argc, char **argv)
@@ -170,7 +189,7 @@ int main(int argc, char **argv)
     string path = argv[1];
     int n = stoi(argv[2]);
 
-    auto ks = {8, 9, 10, 11, 12};
+    auto ks = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
     for (int k : ks)
     {
         cout << endl
