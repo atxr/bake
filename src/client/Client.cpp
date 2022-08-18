@@ -34,6 +34,7 @@ bool Client::enroll(MinutiaeView ref, int k, bool verbose)
     BytesVault bVault = vault.toBytesVault();
 
     // Open the vault and get f0
+    // TODO Return f0 at the end of enroll to avoid this part
     BigInt x;
     x.fromInt(vault.getf0(ref));
 
@@ -96,7 +97,7 @@ bool Client::enroll(MinutiaeView ref, int k, bool verbose)
     OutUnblind.close();
 
     int tEnroll = chrono::duration_cast<chrono::microseconds>(stopEnroll - startEnroll).count();
-    ofstream OutEnroll("out/enroll_" + to_string(k) + ".chrono", ios_base::app);
+    ofstream OutEnroll("out/hide" + to_string(k) + ".chrono", ios_base::app);
     OutEnroll << tEnroll << endl;
     OutEnroll.close();
 
