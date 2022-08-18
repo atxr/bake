@@ -46,7 +46,7 @@ KeyPair keygen(Point P, Group *ECGroup)
 {
     KeyPair kp;
     BigInt sk;
-    ECGroup->get_rand_bn(sk);
+    sk.fromInt(rand());
     return KeyPair(sk, getPublicKey(sk, P));
 }
 
