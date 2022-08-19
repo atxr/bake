@@ -17,6 +17,7 @@ set (app
 	test/bake.cpp
 	test/test.cpp
 	test/time.cpp
+	test/communication.cpp
 )
 set (sources
 	src/core/Core.cpp
