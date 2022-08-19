@@ -31,7 +31,7 @@ brew install openssl #MacOS
 
 The installation script will setup the following libraries, which are requirements:
 - [thimble library](https://github.com/btams/thimble), a Fuzzy Vault implementation
-- [FingerJetFX library](https://github.com/FingerJetFXOSE/FingerJetFXOSE), a Minutiae Point extractor
+- [FingerJetFX library](https://github.com/FingerJetFXOSE/FingerJetFXOSE), a Minutiae Extractor
 
 The is working on x86-64 devices only. Feel free to open an issue if you want an installation script for another architecture. 
 
