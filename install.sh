@@ -6,7 +6,6 @@ if [ ! -d "tmp" ]; then
   echo -e "To rebuild the app, use the following commands:\n"
   echo -e "cd build\ncmake..\nmake\n"
   echo "Otherwise, consider recloning the repo."
-  echo "You can create an issue on https://github.com/atxr/bake if you experience any problem."
   exit
 fi
 
@@ -22,13 +21,14 @@ echo "openssl already installed"
 
 # install thimble lib
 cd tmp
-git clone https://github.com/atxr/thimble
+git clone https://anonymous.4open.science/r/thimble-701C
 cd thimble
 make
 sudo make install
 cd ..
 
 # install fjfx lib
+# this fork contains a fix for a minor bug
 git clone https://github.com/jerem/FingerJetFXOSE
 cd FingerJetFXOSE/FingerJetFXOSE
 ./runCMake.sh x64

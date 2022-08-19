@@ -1,18 +1,19 @@
 # BAKE
 ## Biometrics-authenticated key exchange
 
-This project aims to implement a biometrics-authenticated key exchange protocol designed at da-sec during my internship.
+In this repository, we provide our code corresponding to our submission "Improved Biometrics-Authenticated Key Exchange Based on Fuzzy Vaults" at S&P 2023 (second cycle).
 
 ### Motivation
 
-TODO
+Biometric data are uniquely suited for connecting individuals to their digital identities. Deriving cryptographic key exchange from successful biometric authentication therefore gives an additional layer of trust compared to password-authenticated key exchange. However, biometric data differ from passwords in two crucial points: firstly, they are sensitive personal data that need to be protected on a long-term basis. Secondly, efficient feature extraction and comparison components resulting in high intra-subject tolerance and low inter-subject distinguishability, documented with good biometric performance, need to be applied in order to prevent zero-effort impersonation attacks.
+
+In this work, we present a protocol for secure and efficient biometrics-authenticated key exchange that fulfills the above requirements of biometric information protection compliant with ISO/IEC 24745. The protocol is based on established fuzzy vault schemes and validated with good recognition performance. We build our protocol from established primitives for password-authenticated key exchange using oblivious pseudo-random functions. Our protocol is independent of the biometric modality and can be instantiated both based on the security of discrete logarithms as well as lattices. We provide an open-source implementation of our protocol instantiated with discrete logarithm security and a state-of-the-art unlinkable fingerprint fuzzy vault scheme that is practical with transaction times of less than one second from the image capture to the completed key exchange.
 
 ### Installation & Dependencies
 
-Follow the following steps to install `BAKE`:
+After downloading the repository, follow these steps to install `BAKE`:
 
 ```bash
-git clone https://github.com/atxr/bake
 cd bake
 ./install.sh
 ```
@@ -42,7 +43,7 @@ cmake ..
 make
 ```
 
-Then you will be able to execute the built applications in this directory. Check the (TODO coming soon) documentation to understand the apps.
+Then you will be able to execute the built applications in this directory. Check the documentation to understand the apps.
 The building has been tested on Archlinux x64 only, feel free to open an issue if you experience building issues with another architecture. 
 
 ### Documentation
